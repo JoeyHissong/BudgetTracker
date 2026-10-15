@@ -1,0 +1,4 @@
+<resources>
+    <!-- Background color for the adaptive icon, matches the card background in the brand logo -->
+    <color name="ic_launcher_background">#FFFFFF</color>
+</resources>
