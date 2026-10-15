@@ -95,6 +95,10 @@ npm run lint # run ESLint
 
 Budget Planner stores all data locally on your device using AsyncStorage. Nothing is sent to a server, and the app works entirely offline. See [`docs/privacy.html`](docs/privacy.html) for the full privacy policy.
 
+## License
+
+MIT &copy; Joey Hissong. See [`LICENSE`](LICENSE) for details.
+
 ## Learn more about React Native
 
 - [React Native Website](https://reactnative.dev)
