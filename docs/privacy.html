@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Budget Planner</title>
+  <meta name="description" content="Privacy Policy for Budget Planner, a local-only, privacy-first app for tracking recurring monthly bills." />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <style>
+    :root {
+      --bg: #F9FAFB;
+      --dark: #111827;
+      --muted: #6B7280;
+      --muted-light: #9CA3AF;
+      --border: #E5E7EB;
+      --blue: #2563EB;
+      --white: #FFFFFF;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+      line-height: 1.6;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    header.hero {
+      background: var(--dark);
+      color: var(--white);
+      padding: 48px 0 40px;
+      text-align: center;
+    }
+
+    header.hero h1 {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 0 0 8px;
+    }
+
+    header.hero p.tagline {
+      font-size: 15px;
+      color: #D1D5DB;
+      margin: 0;
+    }
+
+    main {
+      padding: 48px 0 72px;
+    }
+
+    section {
+      margin-bottom: 36px;
+    }
+
+    section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    section p, section li {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    section ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    section li {
+      margin-bottom: 8px;
+    }
+
+    .privacy-note {
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      font-size: 14px;
+      color: #065F46;
+    }
+
+    .updated {
+      font-size: 13px;
+      color: var(--muted-light);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted-light);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <h1>Privacy Policy</h1>
+      <p class="tagline">Budget Planner</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <a class="back-link" href="index.html">&larr; Back to home</a>
+
+    <section>
+      <p class="updated">Last updated: October 15, 2026</p>
+      <p>
+        Budget Planner ("the app") is a local-only budgeting app for tracking recurring monthly
+        bills. This policy explains what data the app handles and how.
+      </p>
+    </section>
+
+    <section>
+      <p class="privacy-note">
+        🔒 Budget Planner does not collect, transmit, or share any personal data. All information
+        you enter stays on your device.
+      </p>
+    </section>
+
+    <section>
+      <h2>Data we collect</h2>
+      <p>
+        None. Budget Planner has no account system, no backend server, and no analytics or
+        advertising SDKs. The app does not know who you are and cannot identify you.
+      </p>
+    </section>
+
+    <section>
+      <h2>Data stored on your device</h2>
+      <p>
+        Bills, due dates, categories, payment status, and your chosen currency are saved locally
+        on your device using AsyncStorage. This data never leaves your device, is never sent to
+        us or any third party, and is only accessible to the app itself.
+      </p>
+    </section>
+
+    <section>
+      <h2>Third-party services</h2>
+      <p>
+        Budget Planner does not integrate with any third-party analytics, advertising, or
+        tracking services. The app works entirely offline.
+      </p>
+    </section>
+
+    <section>
+      <h2>Children's privacy</h2>
+      <p>
+        Budget Planner does not knowingly collect any data from anyone, including children, and
+        is suitable for general audiences.
+      </p>
+    </section>
+
+    <section>
+      <h2>Deleting your data</h2>
+      <p>
+        Since all data is stored locally, you can delete it at any time by removing your bills
+        within the app or by uninstalling the app, which removes all associated local data from
+        your device.
+      </p>
+    </section>
+
+    <section>
+      <h2>Changes to this policy</h2>
+      <p>
+        If this policy changes, the updated version will be posted on this page with a revised
+        "Last updated" date.
+      </p>
+    </section>
+
+    <section>
+      <h2>Contact</h2>
+      <p>
+        Questions about this policy can be raised via
+        <a href="https://github.com/JoeyHissong/BudgetTracker/issues">GitHub Issues</a>.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Budget Planner &mdash; built with React Native &middot;
+    <a href="https://github.com/JoeyHissong/BudgetTracker">Source on GitHub</a>
+  </footer>
+</body>
+</html>
