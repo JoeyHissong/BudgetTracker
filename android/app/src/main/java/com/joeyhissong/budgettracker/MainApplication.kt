@@ -1,4 +1,4 @@
-package com.budgetplanner
+package com.joeyhissong.budgettracker
 
 import android.app.Application
 import com.facebook.react.PackageList

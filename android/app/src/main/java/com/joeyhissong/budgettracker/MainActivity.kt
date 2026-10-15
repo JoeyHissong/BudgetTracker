@@ -1,4 +1,4 @@
-package com.budgetplanner
+package com.joeyhissong.budgettracker
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
