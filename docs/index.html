@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Planner — Simple Recurring Bill Tracker</title>
+  <meta name="description" content="Budget Planner is a local-only, privacy-first app for tracking recurring monthly bills on iOS and Android." />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <style>
+    :root {
+      --bg: #F9FAFB;
+      --dark: #111827;
+      --muted: #6B7280;
+      --muted-light: #9CA3AF;
+      --border: #E5E7EB;
+      --blue: #2563EB;
+      --green: #34D399;
+      --white: #FFFFFF;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+      line-height: 1.5;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    header.hero {
+      background: var(--dark);
+      color: var(--white);
+      padding: 64px 0 56px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 96px;
+      height: 96px;
+      border-radius: 20px;
+      object-fit: cover;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    }
+
+    header.hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      margin: 0 0 10px;
+    }
+
+    header.hero p.tagline {
+      font-size: 17px;
+      color: #D1D5DB;
+      max-width: 480px;
+      margin: 0 auto 28px;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .btn-primary {
+      background: var(--white);
+      color: var(--dark);
+    }
+    .btn-primary:hover { text-decoration: none; opacity: 0.9; }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.35);
+    }
+    .btn-outline:hover { text-decoration: none; border-color: var(--white); }
+
+    main {
+      padding: 56px 0 80px;
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    section h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+
+    .feature-card .emoji {
+      font-size: 26px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .summary-mock {
+      background: var(--dark);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 320px;
+      margin: 0 auto;
+      color: var(--white);
+    }
+
+    .summary-mock .label {
+      color: var(--muted-light);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .summary-mock .total {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 4px 0 16px;
+    }
+
+    .summary-mock .row {
+      display: flex;
+      gap: 24px;
+    }
+
+    .summary-mock .sub-label {
+      color: var(--muted-light);
+      font-size: 12px;
+    }
+
+    .summary-mock .sub-value {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .summary-mock .paid { color: var(--green); }
+
+    .steps {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .steps ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .steps li {
+      margin-bottom: 10px;
+      font-size: 14.5px;
+    }
+
+    pre {
+      background: #0F172A;
+      color: #E5E7EB;
+      padding: 14px 16px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 13px;
+      margin: 8px 0 0;
+    }
+
+    .privacy-note {
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      font-size: 14px;
+      color: #065F46;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted-light);
+    }
+
+    @media (max-width: 480px) {
+      header.hero { padding: 48px 0 40px; }
+      header.hero h1 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <img class="logo" src="assets/logo.jpg" alt="Budget Planner logo" />
+      <h1>Budget Planner</h1>
+      <p class="tagline">
+        A simple, local-only app for tracking recurring monthly bills.
+        No sign-up, no cloud, no ads &mdash; just your bills.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/JoeyHissong/BudgetTracker">View on GitHub</a>
+        <a class="btn btn-outline" href="#get-started">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>What it does</h2>
+      <div class="summary-mock">
+        <div class="label">Remaining this month</div>
+        <div class="total">$1,240.00</div>
+        <div class="row">
+          <div>
+            <div class="sub-label">Total due</div>
+            <div class="sub-value">$2,100.00</div>
+          </div>
+          <div>
+            <div class="sub-label">Paid</div>
+            <div class="sub-value paid">$860.00</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Features</h2>
+      <div class="features">
+        <div class="feature-card">
+          <span class="emoji">🧾</span>
+          <h3>Recurring bills</h3>
+          <p>Add bills once with a due day and category, and they roll forward every month automatically.</p>
+        </div>
+        <div class="feature-card">
+          <span class="emoji">✅</span>
+          <h3>Mark as paid</h3>
+          <p>Tap a bill to mark it paid for the month and watch your remaining balance update instantly.</p>
+        </div>
+        <div class="feature-card">
+          <span class="emoji">📊</span>
+          <h3>Monthly summary</h3>
+          <p>See total due, total paid, and what's left at a glance, broken down by month.</p>
+        </div>
+        <div class="feature-card">
+          <span class="emoji">💱</span>
+          <h3>Multi-currency</h3>
+          <p>Choose the currency that matches your budget from the settings panel.</p>
+        </div>
+        <div class="feature-card">
+          <span class="emoji">🔒</span>
+          <h3>Private by design</h3>
+          <p>Everything is stored locally on your device. No account, no server, no tracking.</p>
+        </div>
+        <div class="feature-card">
+          <span class="emoji">📱</span>
+          <h3>iOS &amp; Android</h3>
+          <p>Built with React Native so it runs natively on both platforms from one codebase.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="privacy-note">
+        🔒 Budget Planner stores all data locally on your device using AsyncStorage. Nothing is
+        sent to a server, and the app works entirely offline.
+      </p>
+    </section>
+
+    <section id="get-started">
+      <h2>Get started</h2>
+      <div class="steps">
+        <ol>
+          <li>Clone the repository and install dependencies</li>
+        </ol>
+        <pre>git clone https://github.com/JoeyHissong/BudgetTracker.git
+cd BudgetTracker
+npm install</pre>
+        <ol start="2">
+          <li>Start Metro, then run the app on your platform of choice</li>
+        </ol>
+        <pre>npm start
+# in a separate terminal
+npm run ios      # or
+npm run android</pre>
+        <ol start="3">
+          <li>See the <a href="https://github.com/JoeyHissong/BudgetTracker#readme">README</a> for environment setup details.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Budget Planner &mdash; built with React Native &middot;
+    <a href="https://github.com/JoeyHissong/BudgetTracker">Source on GitHub</a>
+  </footer>
+</body>
+</html>

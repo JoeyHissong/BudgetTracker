@@ -6,9 +6,15 @@ interface Props {
   totalDue: number;
   totalPaid: number;
   totalRemaining: number;
+  totalIncome?: number;
 }
 
-const SummaryCard: React.FC<Props> = ({ totalDue, totalPaid, totalRemaining }) => {
+const SummaryCard: React.FC<Props> = ({
+  totalDue,
+  totalPaid,
+  totalRemaining,
+  totalIncome,
+}) => {
   const { formatCurrency } = useCurrency();
 
   return (
@@ -26,6 +32,14 @@ const SummaryCard: React.FC<Props> = ({ totalDue, totalPaid, totalRemaining }) =
             {formatCurrency(totalPaid)}
           </Text>
         </View>
+        {!!totalIncome && (
+          <View style={styles.column}>
+            <Text style={styles.subLabel}>Income</Text>
+            <Text style={[styles.subValue, styles.incomeValue]}>
+              {formatCurrency(totalIncome)}
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -72,6 +86,9 @@ const styles = StyleSheet.create({
   },
   paidValue: {
     color: '#34D399',
+  },
+  incomeValue: {
+    color: '#60A5FA',
   },
 });
 

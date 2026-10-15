@@ -3,9 +3,12 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import MonthHeader from '../components/MonthHeader';
 import SummaryCard from '../components/SummaryCard';
 import BillListItem from '../components/BillListItem';
+import PaydayListItem from '../components/PaydayListItem';
 import AddBillModal from '../components/AddBillModal';
+import AddPayScheduleModal from '../components/AddPayScheduleModal';
 import SettingsScreen from './SettingsScreen';
-import { useBills, BillWithStatus } from '../hooks/useBills';
+import { BillWithStatus } from '../hooks/useBills';
+import { useTimeline } from '../hooks/useTimeline';
 import { addMonths } from '../utils/date';
 
 const HomeScreen: React.FC = () => {
@@ -13,18 +16,23 @@ const HomeScreen: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingBill, setEditingBill] = useState<BillWithStatus | null>(null);
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+  const [isPayScheduleModalVisible, setIsPayScheduleModalVisible] = useState(false);
 
   const {
     isLoading,
-    billsForMonth,
+    timeline,
     totalDue,
     totalPaid,
     totalRemaining,
+    totalIncome,
     addBill,
     updateBill,
     deleteBill,
     togglePaid,
-  } = useBills(selectedMonth);
+    paySchedule,
+    setPaySchedule,
+    removePaySchedule,
+  } = useTimeline(selectedMonth);
 
   const openAddModal = () => {
     setEditingBill(null);
@@ -53,6 +61,17 @@ const HomeScreen: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.topBar}>
         <Pressable
+          style={styles.paydayButton}
+          onPress={() => setIsPayScheduleModalVisible(true)}
+          accessibilityRole="button"
+          accessibilityLabel={paySchedule ? 'Edit pay schedule' : 'Add pay schedule'}
+          hitSlop={8}
+        >
+          <Text style={styles.paydayButtonText}>
+            {paySchedule ? '💰 Pay schedule' : '💰 Add pay schedule'}
+          </Text>
+        </Pressable>
+        <Pressable
           style={styles.settingsButton}
           onPress={() => setIsSettingsVisible(true)}
           accessibilityRole="button"
@@ -71,13 +90,14 @@ const HomeScreen: React.FC = () => {
         totalDue={totalDue}
         totalPaid={totalPaid}
         totalRemaining={totalRemaining}
+        totalIncome={totalIncome}
       />
 
       {isLoading ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>Loading…</Text>
         </View>
-      ) : billsForMonth.length === 0 ? (
+      ) : timeline.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>🧾</Text>
           <Text style={styles.emptyText}>No recurring bills yet.</Text>
@@ -87,16 +107,25 @@ const HomeScreen: React.FC = () => {
         </View>
       ) : (
         <FlatList
-          data={billsForMonth}
+          data={timeline}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <BillListItem
-              bill={item}
-              month={selectedMonth}
-              onTogglePaid={togglePaid}
-              onPress={openEditModal}
-            />
-          )}
+          renderItem={({ item }) =>
+            item.type === 'bill' ? (
+              <BillListItem
+                bill={item.bill}
+                month={selectedMonth}
+                onTogglePaid={togglePaid}
+                onPress={openEditModal}
+              />
+            ) : (
+              <PaydayListItem
+                isoDate={item.isoDate}
+                amount={item.amount}
+                coveredAmount={item.coveredAmount}
+                onPress={() => setIsPayScheduleModalVisible(true)}
+              />
+            )
+          }
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
         />
@@ -123,6 +152,14 @@ const HomeScreen: React.FC = () => {
         visible={isSettingsVisible}
         onClose={() => setIsSettingsVisible(false)}
       />
+
+      <AddPayScheduleModal
+        visible={isPayScheduleModalVisible}
+        schedule={paySchedule}
+        onClose={() => setIsPayScheduleModalVisible(false)}
+        onSubmit={setPaySchedule}
+        onDelete={removePaySchedule}
+      />
     </View>
   );
 };
@@ -134,9 +171,21 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
     paddingTop: 4,
+  },
+  paydayButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: '#ECFDF5',
+  },
+  paydayButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#059669',
   },
   settingsButton: {
     width: 36,
