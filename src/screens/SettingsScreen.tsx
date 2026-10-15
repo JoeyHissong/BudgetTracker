@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
-import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CURRENCIES } from '../constants/currencies';
 import { useCurrency } from '../contexts/CurrencyContext';
+
+const DEVELOPER_URL = 'https://www.joeyhissong.com';
 
 interface Props {
   visible: boolean;
@@ -71,6 +73,15 @@ const SettingsScreen: React.FC<Props> = ({ visible, onClose }) => {
               );
             })}
           </View>
+
+          <Pressable
+            style={styles.aboutLink}
+            onPress={() => Linking.openURL(DEVELOPER_URL)}
+            accessibilityRole="link"
+            accessibilityLabel="Visit joeyhissong.com"
+          >
+            <Text style={styles.aboutLinkText}>Made by Joey Hissong · joeyhissong.com</Text>
+          </Pressable>
         </ScrollView>
       </View>
     </View>
@@ -179,6 +190,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#2563EB',
+  },
+  aboutLink: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  aboutLinkText: {
+    fontSize: 13,
+    color: '#9CA3AF',
   },
 });
 
