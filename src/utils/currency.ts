@@ -1,4 +1,4 @@
-import { DEFAULT_CURRENCY_CODE } from '../constants/currencies';
+import { DEFAULT_CURRENCY_CODE, getCurrencyOption } from '../constants/currencies';
 
 export const formatCurrency = (
   amount: number,
@@ -8,3 +8,7 @@ export const formatCurrency = (
     style: 'currency',
     currency: currencyCode,
   }).format(amount);
+
+/** Masked placeholder shown instead of a real amount when "Hide numbers" is on. */
+export const maskCurrency = (currencyCode: string = DEFAULT_CURRENCY_CODE): string =>
+  `${getCurrencyOption(currencyCode).symbol}••••`;

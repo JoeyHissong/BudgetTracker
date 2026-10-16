@@ -4,6 +4,7 @@ import MonthHeader from '../components/MonthHeader';
 import SummaryCard from '../components/SummaryCard';
 import BillListItem from '../components/BillListItem';
 import PaydayListItem from '../components/PaydayListItem';
+import CarryoverListItem from '../components/CarryoverListItem';
 import AddBillModal from '../components/AddBillModal';
 import AddPayScheduleModal from '../components/AddPayScheduleModal';
 import SettingsScreen from './SettingsScreen';
@@ -117,13 +118,15 @@ const HomeScreen: React.FC = () => {
                 onTogglePaid={togglePaid}
                 onPress={openEditModal}
               />
-            ) : (
+            ) : item.type === 'payday' ? (
               <PaydayListItem
                 isoDate={item.isoDate}
                 amount={item.amount}
                 coveredAmount={item.coveredAmount}
                 onPress={() => setIsPayScheduleModalVisible(true)}
               />
+            ) : (
+              <CarryoverListItem amount={item.amount} coveredAmount={item.coveredAmount} />
             )
           }
           contentContainerStyle={styles.listContent}

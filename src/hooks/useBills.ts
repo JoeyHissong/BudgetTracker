@@ -124,7 +124,12 @@ export const useBills = (selectedMonth: Date) => {
   return {
     isLoading,
     billsForMonth,
+    // Bills recur identically every month (there's no per-month bill
+    // history), so last month's total due is the same as this month's.
+    // Exposed under its own name so callers computing carry-over are
+    // explicit about which month's total they mean.
     totalDue,
+    totalDuePreviousMonth: totalDue,
     totalPaid,
     totalRemaining,
     addBill,

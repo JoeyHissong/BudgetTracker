@@ -5,7 +5,7 @@ import {
   loadPaySchedule,
   savePaySchedule,
 } from '../storage/payScheduleStorage';
-import { getPaydaysInMonth } from '../utils/date';
+import { addMonths, getPaydaysInMonth } from '../utils/date';
 
 export interface PaydayForMonth {
   id: string;
@@ -56,6 +56,15 @@ export const usePaySchedule = (selectedMonth: Date) => {
     [paydaysForMonth],
   );
 
+  const previousMonth = useMemo(() => addMonths(selectedMonth, -1), [selectedMonth]);
+
+  const totalIncomePreviousMonth = useMemo(() => {
+    if (!schedule) {
+      return 0;
+    }
+    return getPaydaysInMonth(schedule, previousMonth).length * schedule.amount;
+  }, [schedule, previousMonth]);
+
   return {
     isLoading,
     schedule,
@@ -63,5 +72,6 @@ export const usePaySchedule = (selectedMonth: Date) => {
     removePaySchedule,
     paydaysForMonth,
     totalIncome,
+    totalIncomePreviousMonth,
   };
 };

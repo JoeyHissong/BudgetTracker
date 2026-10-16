@@ -10,6 +10,9 @@ export const getMonthKey = (date: Date): string => {
 export const getMonthKeyFromISODate = (isoDate: string): string =>
   isoDate.slice(0, 7);
 
+/** Today's date as an ISO "YYYY-MM-DD" string, in local time. */
+export const getTodayISODate = (): string => toISODate(new Date(), new Date().getDate());
+
 /** e.g. "October 2026" */
 export const formatMonthLabel = (date: Date): string =>
   date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });

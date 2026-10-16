@@ -1,9 +1,21 @@
-import React, { useEffect } from 'react';
-import { BackHandler, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { CURRENCIES } from '../constants/currencies';
+import React, { useEffect, useState } from 'react';
+import {
+  BackHandler,
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { getCurrencyOption } from '../constants/currencies';
 import { useCurrency } from '../contexts/CurrencyContext';
+import CurrencyPickerModal from '../components/CurrencyPickerModal';
 
 const DEVELOPER_URL = 'https://www.joeyhissong.com';
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 interface Props {
   visible: boolean;
@@ -11,7 +23,44 @@ interface Props {
 }
 
 const SettingsScreen: React.FC<Props> = ({ visible, onClose }) => {
-  const { currencyCode, setCurrencyCode } = useCurrency();
+  const {
+    currencyCode,
+    setCurrencyCode,
+    hideNumbers,
+    setHideNumbers,
+    budgetStartDate,
+    setBudgetStartDate,
+  } = useCurrency();
+  const [startDateInput, setStartDateInput] = useState(budgetStartDate);
+  const [startDateError, setStartDateError] = useState('');
+  const [isCurrencyPickerVisible, setIsCurrencyPickerVisible] = useState(false);
+  const selectedCurrency = getCurrencyOption(currencyCode);
+
+  useEffect(() => {
+    if (visible) {
+      setStartDateInput(budgetStartDate);
+      setStartDateError('');
+    }
+  }, [visible, budgetStartDate]);
+
+  const commitStartDate = () => {
+    if (!ISO_DATE_PATTERN.test(startDateInput)) {
+      setStartDateError('Enter a date as YYYY-MM-DD.');
+      return;
+    }
+    const [year, month, day] = startDateInput.split('-').map(Number);
+    const parsed = new Date(year, month - 1, day);
+    if (
+      parsed.getFullYear() !== year ||
+      parsed.getMonth() !== month - 1 ||
+      parsed.getDate() !== day
+    ) {
+      setStartDateError('Enter a valid calendar date.');
+      return;
+    }
+    setStartDateError('');
+    setBudgetStartDate(startDateInput);
+  };
 
   useEffect(() => {
     if (!visible) {
@@ -50,28 +99,59 @@ const SettingsScreen: React.FC<Props> = ({ visible, onClose }) => {
             </Pressable>
           </View>
 
-          <Text style={styles.fieldLabel}>Currency</Text>
-          <View style={styles.currencyList}>
-            {CURRENCIES.map(currency => {
-              const selected = currency.code === currencyCode;
-              return (
-                <Pressable
-                  key={currency.code}
-                  onPress={() => setCurrencyCode(currency.code)}
-                  style={[styles.currencyRow, selected && styles.currencyRowSelected]}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected }}
-                  accessibilityLabel={`${currency.name} (${currency.code})`}
-                >
-                  <Text style={styles.currencySymbol}>{currency.symbol}</Text>
-                  <View style={styles.currencyTextWrap}>
-                    <Text style={styles.currencyName}>{currency.name}</Text>
-                    <Text style={styles.currencyCode}>{currency.code}</Text>
-                  </View>
-                  {selected && <Text style={styles.checkmark}>✓</Text>}
-                </Pressable>
-              );
-            })}
+          <Pressable
+            style={styles.linkRow}
+            onPress={() => setIsCurrencyPickerVisible(true)}
+            accessibilityRole="button"
+            accessibilityLabel={`Currency, currently ${selectedCurrency.name} (${selectedCurrency.code})`}
+          >
+            <Text style={styles.linkRowLabel}>Currency</Text>
+            <View style={styles.linkRowValueWrap}>
+              <Text style={styles.linkRowValue}>
+                {selectedCurrency.symbol} {selectedCurrency.code}
+              </Text>
+              <Text style={styles.chevron}>›</Text>
+            </View>
+          </Pressable>
+
+          <Text style={[styles.fieldLabel, styles.sectionSpacing]}>Privacy</Text>
+          <View style={styles.toggleRow}>
+            <View style={styles.toggleTextWrap}>
+              <Text style={styles.toggleLabel}>Hide numbers</Text>
+              <Text style={styles.toggleSubtext}>Blur amounts shown throughout the app</Text>
+            </View>
+            <Switch
+              value={hideNumbers}
+              onValueChange={setHideNumbers}
+              accessibilityRole="switch"
+              accessibilityLabel="Hide numbers"
+              accessibilityState={{ checked: hideNumbers }}
+              trackColor={{ false: '#E5E7EB', true: '#2563EB' }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+
+          <Text style={[styles.fieldLabel, styles.sectionSpacing]}>Budget tracking</Text>
+          <View style={styles.startDateCard}>
+            <Text style={styles.toggleLabel}>Start date</Text>
+            <Text style={styles.toggleSubtext}>
+              The date you started tracking with this app. Bills and paychecks
+              before this date aren't counted as a carried-over balance.
+            </Text>
+            <TextInput
+              value={startDateInput}
+              onChangeText={text => {
+                setStartDateInput(text);
+                setStartDateError('');
+              }}
+              onBlur={commitStartDate}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor="#9CA3AF"
+              style={styles.startDateInput}
+              accessibilityLabel="Budget start date"
+              maxLength={10}
+            />
+            {!!startDateError && <Text style={styles.error}>{startDateError}</Text>}
           </View>
 
           <Pressable
@@ -84,6 +164,13 @@ const SettingsScreen: React.FC<Props> = ({ visible, onClose }) => {
           </Pressable>
         </ScrollView>
       </View>
+
+      <CurrencyPickerModal
+        visible={isCurrencyPickerVisible}
+        currencyCode={currencyCode}
+        onSelect={setCurrencyCode}
+        onClose={() => setIsCurrencyPickerVisible(false)}
+      />
     </View>
   );
 };
@@ -149,47 +236,86 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginBottom: 8,
   },
-  currencyList: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
+  sectionSpacing: {
+    marginTop: 20,
   },
-  currencyRow: {
+  linkRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 14,
     backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
   },
-  currencyRowSelected: {
-    backgroundColor: '#EFF6FF',
-  },
-  currencySymbol: {
-    width: 36,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#374151',
-  },
-  currencyTextWrap: {
-    flex: 1,
-  },
-  currencyName: {
+  linkRowLabel: {
     fontSize: 15,
     fontWeight: '600',
     color: '#111827',
   },
-  currencyCode: {
+  linkRowValueWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  linkRowValue: {
+    fontSize: 15,
+    color: '#6B7280',
+    marginRight: 6,
+  },
+  chevron: {
+    fontSize: 18,
+    color: '#D1D5DB',
+    fontWeight: '600',
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  toggleTextWrap: {
+    flex: 1,
+    marginRight: 12,
+  },
+  toggleLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  toggleSubtext: {
     fontSize: 12,
     color: '#6B7280',
     marginTop: 2,
   },
-  checkmark: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#2563EB',
+  startDateCard: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  startDateInput: {
+    fontSize: 15,
+    color: '#111827',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 10,
+  },
+  error: {
+    color: '#DC2626',
+    fontSize: 13,
+    marginTop: 6,
   },
   aboutLink: {
     marginTop: 24,
