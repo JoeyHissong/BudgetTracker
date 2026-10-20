@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { BillWithStatus } from '../hooks/useBills';
 import { getCategoryInfo } from '../constants/categories';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { formatDueDate, isPastDue } from '../utils/date';
+import { ThemeColors } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Props {
   bill: BillWithStatus;
@@ -14,6 +16,8 @@ interface Props {
 
 const BillListItem: React.FC<Props> = ({ bill, month, onTogglePaid, onPress }) => {
   const { formatCurrency } = useCurrency();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const categoryInfo = getCategoryInfo(bill.category);
   const overdue = !bill.isPaid && isPastDue(month, bill.dueDay);
 
@@ -53,68 +57,69 @@ const BillListItem: React.FC<Props> = ({ bill, month, onTogglePaid, onPress }) =
   );
 };
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  icon: {
-    fontSize: 18,
-  },
-  details: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  meta: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  overdueMeta: {
-    color: '#DC2626',
-    fontWeight: '600',
-  },
-  amount: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#111827',
-    marginRight: 12,
-  },
-  checkbox: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
-  },
-  checkmark: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    iconWrap: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+    },
+    icon: {
+      fontSize: 18,
+    },
+    details: {
+      flex: 1,
+    },
+    name: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    meta: {
+      fontSize: 12,
+      color: colors.textMuted,
+      marginTop: 2,
+    },
+    overdueMeta: {
+      color: colors.danger,
+      fontWeight: '600',
+    },
+    amount: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.text,
+      marginRight: 12,
+    },
+    checkbox: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      borderWidth: 2,
+      borderColor: colors.borderStrong,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    checkboxChecked: {
+      backgroundColor: colors.success,
+      borderColor: colors.success,
+    },
+    checkmark: {
+      color: colors.onSuccess,
+      fontSize: 15,
+      fontWeight: '700',
+    },
+  });
 
 export default BillListItem;

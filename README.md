@@ -11,6 +11,7 @@ Built with [React Native](https://reactnative.dev) and TypeScript.
 - **Monthly summary** — See total due, total paid, and what's left at a glance, broken down by month.
 - **Pay schedule tracking** — Track upcoming paydays alongside your bills to see how income lines up with what's due.
 - **Multi-currency** — Choose the currency that matches your budget from the settings panel.
+- **Export & import your data** — Download everything as a JSON file from Settings, and restore it later (new device, reinstall, etc.) by importing that same file.
 - **Private by design** — Everything is stored locally on-device with AsyncStorage. No account, no server, no tracking.
 - **iOS & Android** — One React Native codebase running natively on both platforms.
 
@@ -21,10 +22,10 @@ App.tsx                   App entry point
 src/
   components/             Reusable UI (bill list items, modals, summary card, etc.)
   constants/              Static data (currency list, etc.)
-  contexts/                React context providers (currency)
+  contexts/                React context providers (currency, theme)
   hooks/                   Data/state hooks (bills, pay schedule, timeline)
   screens/                 Top-level screens (Home, Settings)
-  storage/                 AsyncStorage-backed persistence (bills, pay schedule, settings)
+  storage/                 AsyncStorage-backed persistence (bills, pay schedule, settings, backup export/import)
   utils/                   Pure helpers (date math, currency formatting)
   types.ts                 Shared TypeScript types
 docs/                      Marketing/landing page, deployed via GitHub Pages
@@ -91,9 +92,13 @@ npm test     # run the Jest test suite
 npm run lint # run ESLint
 ```
 
+## Backing up your data
+
+Since everything is stored locally with no account or cloud sync, Settings → Data lets you export a JSON snapshot of all your bills, pay schedule, and preferences, and import it back later (e.g. after reinstalling or switching devices). Importing fully replaces the data currently in the app. This feature uses [`@react-native-documents/picker`](https://react-native-documents.github.io/) for the native save/open dialogs and [`@dr.pogodin/react-native-fs`](https://github.com/birdofpreyru/react-native-fs) for reading/writing the file — both are native modules, so after pulling changes that touch them you'll need to reinstall CocoaPods (`bundle exec pod install`) and rebuild the Android app.
+
 ## Privacy
 
-Budget Planner stores all data locally on your device using AsyncStorage. Nothing is sent to a server, and the app works entirely offline. See [`docs/privacy.html`](docs/privacy.html) for the full privacy policy.
+Budget Planner stores all data locally on your device using AsyncStorage. Nothing is sent to a server, and the app works entirely offline. The export/import feature only writes to a file you explicitly choose to save or open — the app never transmits data anywhere. See [`docs/privacy.html`](docs/privacy.html) for the full privacy policy.
 
 ## License
 

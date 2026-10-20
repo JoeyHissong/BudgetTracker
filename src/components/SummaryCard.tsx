@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { ThemeColors } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Props {
   totalDue: number;
@@ -16,6 +18,8 @@ const SummaryCard: React.FC<Props> = ({
   totalIncome,
 }) => {
   const { formatCurrency } = useCurrency();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.card}>
@@ -45,51 +49,55 @@ const SummaryCard: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#111827',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 8,
-    padding: 20,
-  },
-  label: {
-    color: '#9CA3AF',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  total: {
-    color: '#FFFFFF',
-    fontSize: 36,
-    fontWeight: '800',
-    marginTop: 4,
-  },
-  row: {
-    flexDirection: 'row',
-    marginTop: 16,
-    gap: 24,
-  },
-  column: {
-    flex: 1,
-  },
-  subLabel: {
-    color: '#9CA3AF',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  subValue: {
-    color: '#E5E7EB',
-    fontSize: 16,
-    fontWeight: '700',
-    marginTop: 2,
-  },
-  paidValue: {
-    color: '#34D399',
-  },
-  incomeValue: {
-    color: '#60A5FA',
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.summaryCardBackground,
+      borderRadius: 16,
+      marginHorizontal: 16,
+      marginTop: 12,
+      marginBottom: 8,
+      padding: 20,
+    },
+    label: {
+      color: colors.summaryCardTextMuted,
+      fontSize: 13,
+      fontWeight: '500',
+    },
+    total: {
+      color: colors.summaryCardText,
+      fontSize: 36,
+      fontWeight: '800',
+      marginTop: 4,
+    },
+    row: {
+      flexDirection: 'row',
+      marginTop: 16,
+      gap: 24,
+    },
+    column: {
+      flex: 1,
+    },
+    subLabel: {
+      color: colors.summaryCardTextMuted,
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    subValue: {
+      color: colors.summaryCardText,
+      fontSize: 16,
+      fontWeight: '700',
+      marginTop: 2,
+      opacity: 0.9,
+    },
+    paidValue: {
+      color: colors.success,
+      opacity: 1,
+    },
+    incomeValue: {
+      color: colors.summaryCardIncome,
+      opacity: 1,
+    },
+  });
 
 export default SummaryCard;

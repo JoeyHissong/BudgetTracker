@@ -9,6 +9,9 @@ gem 'activesupport', '>= 6.1.7.5', '!= 7.1.0'
 gem 'xcodeproj', '< 1.26.0'
 gem 'concurrent-ruby', '< 1.3.4'
 
+# Used to automate uploading the Android release build to Google Play.
+gem 'fastlane', '2.241.1'
+
 # Ruby 3.4.0 has removed some libraries from the standard library.
 gem 'bigdecimal'
 gem 'logger'

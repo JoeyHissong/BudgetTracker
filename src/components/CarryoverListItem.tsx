@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { ThemeColors } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Props {
   amount: number;
@@ -14,6 +16,8 @@ interface Props {
  */
 const CarryoverListItem: React.FC<Props> = ({ amount, coveredAmount }) => {
   const { formatCurrency } = useCurrency();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const leftOver = amount - coveredAmount;
 
   return (
@@ -38,47 +42,48 @@ const CarryoverListItem: React.FC<Props> = ({ amount, coveredAmount }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#EFF6FF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#DBEAFE',
-  },
-  iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    backgroundColor: '#DBEAFE',
-  },
-  icon: {
-    fontSize: 18,
-  },
-  details: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1E3A8A',
-  },
-  meta: {
-    fontSize: 12,
-    color: '#1D4ED8',
-    marginTop: 2,
-  },
-  amount: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#2563EB',
-    marginRight: 12,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: colors.carryoverBackground,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.carryoverBorder,
+    },
+    iconWrap: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+      backgroundColor: colors.carryoverIconBackground,
+    },
+    icon: {
+      fontSize: 18,
+    },
+    details: {
+      flex: 1,
+    },
+    name: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.carryoverText,
+    },
+    meta: {
+      fontSize: 12,
+      color: colors.carryoverTextMuted,
+      marginTop: 2,
+    },
+    amount: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.carryoverAmount,
+      marginRight: 12,
+    },
+  });
 
 export default CarryoverListItem;

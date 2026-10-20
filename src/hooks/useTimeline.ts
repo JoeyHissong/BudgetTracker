@@ -145,5 +145,9 @@ export const useTimeline = (selectedMonth: Date) => {
     paySchedule: payScheduleHook.schedule,
     setPaySchedule: payScheduleHook.setPaySchedule,
     removePaySchedule: payScheduleHook.removePaySchedule,
+    /** Re-reads bills, payments, and pay schedule from storage, e.g. after a data import. */
+    reload: async () => {
+      await Promise.all([billsHook.reload(), payScheduleHook.reload()]);
+    },
   };
 };

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { formatPaydayLabel } from '../utils/date';
+import { ThemeColors } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Props {
   isoDate: string;
@@ -12,6 +14,8 @@ interface Props {
 
 const PaydayListItem: React.FC<Props> = ({ isoDate, amount, coveredAmount, onPress }) => {
   const { formatCurrency } = useCurrency();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const leftOver = amount - coveredAmount;
 
   return (
@@ -36,47 +40,48 @@ const PaydayListItem: React.FC<Props> = ({ isoDate, amount, coveredAmount, onPre
   );
 };
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#ECFDF5',
-    borderBottomWidth: 1,
-    borderBottomColor: '#D1FAE5',
-  },
-  iconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    backgroundColor: '#D1FAE5',
-  },
-  icon: {
-    fontSize: 18,
-  },
-  details: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#065F46',
-  },
-  meta: {
-    fontSize: 12,
-    color: '#047857',
-    marginTop: 2,
-  },
-  amount: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#059669',
-    marginRight: 12,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: colors.paydayBackground,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.paydayBorder,
+    },
+    iconWrap: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 12,
+      backgroundColor: colors.paydayIconBackground,
+    },
+    icon: {
+      fontSize: 18,
+    },
+    details: {
+      flex: 1,
+    },
+    name: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.paydayText,
+    },
+    meta: {
+      fontSize: 12,
+      color: colors.paydayTextMuted,
+      marginTop: 2,
+    },
+    amount: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.paydayAmount,
+      marginRight: 12,
+    },
+  });
 
 export default PaydayListItem;

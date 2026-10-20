@@ -25,6 +25,13 @@ export const useBills = (selectedMonth: Date) => {
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const reload = useCallback(async () => {
+    const [storedBills, storedPayments] = await Promise.all([loadBills(), loadPayments()]);
+    setBills(storedBills);
+    setPayments(storedPayments);
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     Promise.all([loadBills(), loadPayments()]).then(([storedBills, storedPayments]) => {
@@ -136,5 +143,7 @@ export const useBills = (selectedMonth: Date) => {
     updateBill,
     deleteBill,
     togglePaid,
+    /** Re-reads bills and payments from storage, e.g. after a data import. */
+    reload,
   };
 };

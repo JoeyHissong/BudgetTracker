@@ -31,6 +31,8 @@ interface CurrencyContextValue {
   /** ISO "YYYY-MM-DD" date the user started tracking their budget. */
   budgetStartDate: string;
   setBudgetStartDate: (isoDate: string) => void;
+  /** Re-reads currency/privacy/start-date settings from storage, e.g. after a data import. */
+  reload: () => Promise<void>;
 }
 
 const CurrencyContext = createContext<CurrencyContextValue | undefined>(undefined);
@@ -42,6 +44,22 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
   const [hideNumbers, setHideNumbersState] = useState(false);
   const [budgetStartDate, setBudgetStartDateState] = useState(getTodayISODate());
   const [isLoading, setIsLoading] = useState(true);
+
+  const reload = useCallback(async () => {
+    const [storedCurrency, storedHideNumbers, storedStartDate] = await Promise.all([
+      loadCurrencyCode(),
+      loadHideNumbers(),
+      loadBudgetStartDate(),
+    ]);
+    if (storedCurrency) {
+      setCurrencyCodeState(storedCurrency);
+    }
+    setHideNumbersState(storedHideNumbers !== null ? storedHideNumbers : false);
+    if (storedStartDate) {
+      setBudgetStartDateState(storedStartDate);
+    }
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -106,6 +124,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
       setHideNumbers,
       budgetStartDate,
       setBudgetStartDate,
+      reload,
     }),
     [
       currencyCode,
@@ -116,6 +135,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
       setHideNumbers,
       budgetStartDate,
       setBudgetStartDate,
+      reload,
     ],
   );
 

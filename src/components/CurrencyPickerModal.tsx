@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CURRENCIES } from '../constants/currencies';
+import { ThemeColors } from '../constants/theme';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Props {
   visible: boolean;
@@ -19,6 +21,9 @@ const CurrencyPickerModal: React.FC<Props> = ({
   onSelect,
   onClose,
 }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   useEffect(() => {
     if (!visible) {
       return;
@@ -87,103 +92,104 @@ const CurrencyPickerModal: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-end',
-    zIndex: 20,
-  },
-  backdropTouchable: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  sheetWrap: {
-    width: '100%',
-    maxHeight: '88%',
-  },
-  sheet: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-  },
-  sheetContent: {
-    padding: 20,
-    paddingBottom: 32,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#E5E7EB',
-    alignSelf: 'center',
-    marginBottom: 16,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  closeText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#2563EB',
-  },
-  currencyList: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-  },
-  currencyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  currencyRowSelected: {
-    backgroundColor: '#EFF6FF',
-  },
-  currencySymbol: {
-    width: 36,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#374151',
-  },
-  currencyTextWrap: {
-    flex: 1,
-  },
-  currencyName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  currencyCode: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  checkmark: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#2563EB',
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    backdrop: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: colors.backdrop,
+      justifyContent: 'flex-end',
+      zIndex: 20,
+    },
+    backdropTouchable: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    },
+    sheetWrap: {
+      width: '100%',
+      maxHeight: '88%',
+    },
+    sheet: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+    },
+    sheetContent: {
+      padding: 20,
+      paddingBottom: 32,
+    },
+    handle: {
+      width: 40,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: colors.handle,
+      alignSelf: 'center',
+      marginBottom: 16,
+    },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    closeText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.accent,
+    },
+    currencyList: {
+      borderRadius: 12,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    currencyRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+      backgroundColor: colors.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    currencyRowSelected: {
+      backgroundColor: colors.surfaceAlt,
+    },
+    currencySymbol: {
+      width: 36,
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.textMuted,
+    },
+    currencyTextWrap: {
+      flex: 1,
+    },
+    currencyName: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    currencyCode: {
+      fontSize: 12,
+      color: colors.textMuted,
+      marginTop: 2,
+    },
+    checkmark: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.accent,
+    },
+  });
 
 export default CurrencyPickerModal;

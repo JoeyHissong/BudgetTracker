@@ -17,6 +17,12 @@ export const usePaySchedule = (selectedMonth: Date) => {
   const [schedule, setSchedule] = useState<PaySchedule | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const reload = useCallback(async () => {
+    const stored = await loadPaySchedule();
+    setSchedule(stored);
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     loadPaySchedule().then(stored => {
@@ -73,5 +79,7 @@ export const usePaySchedule = (selectedMonth: Date) => {
     paydaysForMonth,
     totalIncome,
     totalIncomePreviousMonth,
+    /** Re-reads the pay schedule from storage, e.g. after a data import. */
+    reload,
   };
 };

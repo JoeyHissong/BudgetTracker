@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemePreference } from '../constants/theme';
 
 const CURRENCY_KEY = '@budget_planner/currency';
 const HIDE_NUMBERS_KEY = '@budget_planner/hide_numbers';
 const BUDGET_START_DATE_KEY = '@budget_planner/budget_start_date';
+const THEME_PREFERENCE_KEY = '@budget_planner/theme_preference';
 
 export const loadCurrencyCode = async (): Promise<string | null> => {
   try {
@@ -58,5 +60,26 @@ export const saveBudgetStartDate = async (isoDate: string): Promise<void> => {
     await AsyncStorage.setItem(BUDGET_START_DATE_KEY, isoDate);
   } catch (error) {
     console.warn('Failed to save budget start date to storage', error);
+  }
+};
+
+export const loadThemePreference = async (): Promise<ThemePreference | null> => {
+  try {
+    const stored = await AsyncStorage.getItem(THEME_PREFERENCE_KEY);
+    if (stored === 'light' || stored === 'dark' || stored === 'system') {
+      return stored;
+    }
+    return null;
+  } catch (error) {
+    console.warn('Failed to load theme preference from storage', error);
+    return null;
+  }
+};
+
+export const saveThemePreference = async (preference: ThemePreference): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(THEME_PREFERENCE_KEY, preference);
+  } catch (error) {
+    console.warn('Failed to save theme preference to storage', error);
   }
 };
