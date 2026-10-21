@@ -12,6 +12,8 @@ import { PayFrequency, PaySchedule } from '../types';
 import { useKeyboardHeight } from '../hooks/useKeyboardHeight';
 import { ThemeColors } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
+import CalendarPickerModal from './CalendarPickerModal';
+import { formatShortDate } from '../utils/date';
 
 interface Props {
   visible: boolean;
@@ -45,6 +47,7 @@ const AddPayScheduleModal: React.FC<Props> = ({
   const [dayOfMonth, setDayOfMonth] = useState('1');
   const [secondDayOfMonth, setSecondDayOfMonth] = useState('15');
   const [error, setError] = useState('');
+  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
   const keyboardHeight = useKeyboardHeight();
 
   useEffect(() => {
@@ -62,6 +65,7 @@ const AddPayScheduleModal: React.FC<Props> = ({
       setSecondDayOfMonth('15');
     }
     setError('');
+    setIsCalendarVisible(false);
   }, [visible, schedule]);
 
   useEffect(() => {
@@ -85,21 +89,9 @@ const AddPayScheduleModal: React.FC<Props> = ({
       return;
     }
 
-    if (usesAnchorDate) {
-      if (!ISO_DATE_PATTERN.test(anchorDate)) {
-        setError('Enter a payday date as YYYY-MM-DD.');
-        return;
-      }
-      const [year, month, day] = anchorDate.split('-').map(Number);
-      const parsedDate = new Date(year, month - 1, day);
-      if (
-        parsedDate.getFullYear() !== year ||
-        parsedDate.getMonth() !== month - 1 ||
-        parsedDate.getDate() !== day
-      ) {
-        setError('Enter a valid calendar date as YYYY-MM-DD.');
-        return;
-      }
+    if (usesAnchorDate && !ISO_DATE_PATTERN.test(anchorDate)) {
+      setError('Select a payday date from the calendar.');
+      return;
     }
 
     let parsedDayOfMonth = 1;
@@ -210,18 +202,21 @@ const AddPayScheduleModal: React.FC<Props> = ({
           {usesAnchorDate && (
             <>
               <Text style={styles.fieldLabel}>A recent or upcoming payday</Text>
-              <TextInput
-                value={anchorDate}
-                onChangeText={text => {
-                  setAnchorDate(text);
-                  setError('');
-                }}
-                placeholder="YYYY-MM-DD"
-                style={styles.textInput}
-                placeholderTextColor={colors.textFaint}
-                accessibilityLabel="Payday anchor date"
-                maxLength={10}
-              />
+              <Pressable
+                style={styles.dateField}
+                onPress={() => setIsCalendarVisible(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Choose payday anchor date"
+              >
+                <Text
+                  style={[
+                    styles.dateFieldText,
+                    !anchorDate && styles.dateFieldPlaceholder,
+                  ]}
+                >
+                  {anchorDate ? formatShortDate(anchorDate) : 'Select a date'}
+                </Text>
+              </Pressable>
               <Text style={styles.helperText}>
                 We use this date to figure out the rest of your paydays.
               </Text>
@@ -298,6 +293,16 @@ const AddPayScheduleModal: React.FC<Props> = ({
           )}
         </ScrollView>
       </View>
+
+      <CalendarPickerModal
+        visible={isCalendarVisible}
+        value={anchorDate}
+        onClose={() => setIsCalendarVisible(false)}
+        onSelect={isoDate => {
+          setAnchorDate(isoDate);
+          setError('');
+        }}
+      />
     </View>
   );
 };
@@ -363,6 +368,20 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 10,
       paddingHorizontal: 12,
       paddingVertical: 10,
+    },
+    dateField: {
+      borderWidth: 1,
+      borderColor: colors.handle,
+      borderRadius: 10,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+    },
+    dateFieldText: {
+      fontSize: 15,
+      color: colors.text,
+    },
+    dateFieldPlaceholder: {
+      color: colors.textFaint,
     },
     amountInput: {
       fontSize: 32,

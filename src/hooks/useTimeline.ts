@@ -135,7 +135,10 @@ export const useTimeline = (selectedMonth: Date) => {
     timeline,
     totalDue: billsHook.totalDue,
     totalPaid: billsHook.totalPaid,
-    totalRemaining: billsHook.totalRemaining - carryIn,
+    // "Remaining" is strictly what's left to pay on this month's bills.
+    // carryIn is leftover cash, not a bill, so it belongs in totalIncome
+    // (and in its own "Carried over" row in the timeline) rather than here.
+    totalRemaining: billsHook.totalRemaining,
     totalIncome: payScheduleHook.totalIncome + carryIn,
     carryIn,
     addBill: billsHook.addBill,

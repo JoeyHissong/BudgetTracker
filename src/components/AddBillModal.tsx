@@ -14,6 +14,7 @@ import { NewBillInput, BillWithStatus } from '../hooks/useBills';
 import { useKeyboardHeight } from '../hooks/useKeyboardHeight';
 import { ThemeColors } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
+import DayOfMonthPickerModal from './DayOfMonthPickerModal';
 
 interface Props {
   visible: boolean;
@@ -39,6 +40,7 @@ const AddBillModal: React.FC<Props> = ({
   const [note, setNote] = useState('');
   const [category, setCategory] = useState<BillCategory>('Rent/Mortgage');
   const [error, setError] = useState('');
+  const [isDayPickerVisible, setIsDayPickerVisible] = useState(false);
   const keyboardHeight = useKeyboardHeight();
 
   useEffect(() => {
@@ -56,6 +58,7 @@ const AddBillModal: React.FC<Props> = ({
       setCategory('Rent/Mortgage');
     }
     setError('');
+    setIsDayPickerVisible(false);
   }, [visible, editingBill]);
 
   useEffect(() => {
@@ -154,19 +157,16 @@ const AddBillModal: React.FC<Props> = ({
           />
 
           <Text style={styles.fieldLabel}>Due day of month</Text>
-          <TextInput
-            value={dueDay}
-            onChangeText={text => {
-              setDueDay(text.replace(/[^0-9]/g, ''));
-              setError('');
-            }}
-            placeholder="1-31"
-            keyboardType="number-pad"
+          <Pressable
             style={styles.textInput}
-            placeholderTextColor={colors.textFaint}
-            accessibilityLabel="Due day of month"
-            maxLength={2}
-          />
+            onPress={() => setIsDayPickerVisible(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Choose due day of month"
+          >
+            <Text style={[styles.dateFieldText, !dueDay && styles.dateFieldPlaceholder]}>
+              {dueDay || 'Select a day'}
+            </Text>
+          </Pressable>
 
           {!!error && <Text style={styles.error}>{error}</Text>}
 
@@ -245,6 +245,17 @@ const AddBillModal: React.FC<Props> = ({
           )}
         </ScrollView>
       </View>
+
+      <DayOfMonthPickerModal
+        visible={isDayPickerVisible}
+        title="Due day of month"
+        value={dueDay ? Number(dueDay) : null}
+        onClose={() => setIsDayPickerVisible(false)}
+        onSelect={day => {
+          setDueDay(String(day));
+          setError('');
+        }}
+      />
     </View>
   );
 };
@@ -318,6 +329,13 @@ const createStyles = (colors: ThemeColors) =>
       paddingVertical: 4,
       borderBottomWidth: 2,
       borderBottomColor: colors.handle,
+    },
+    dateFieldText: {
+      fontSize: 15,
+      color: colors.text,
+    },
+    dateFieldPlaceholder: {
+      color: colors.textFaint,
     },
     error: {
       color: colors.danger,
