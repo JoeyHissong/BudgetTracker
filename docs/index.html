@@ -5,65 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Budget Planner — Simple Recurring Bill Tracker</title>
   <meta name="description" content="Budget Planner is a local-only, privacy-first app for tracking recurring monthly bills on iOS and Android." />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Budget Planner — Simple Recurring Bill Tracker" />
+  <meta property="og:description" content="A local-only, privacy-first app for tracking recurring monthly bills. No sign-up, no cloud, no ads." />
+  <meta property="og:image" content="https://joeyhissong.github.io/BudgetTracker/assets/logo.jpg" />
+  <meta property="og:url" content="https://joeyhissong.github.io/BudgetTracker/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Budget Planner — Simple Recurring Bill Tracker" />
+  <meta name="twitter:description" content="A local-only, privacy-first app for tracking recurring monthly bills. No sign-up, no cloud, no ads." />
+  <meta name="twitter:image" content="https://joeyhissong.github.io/BudgetTracker/assets/logo.jpg" />
+
   <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #F9FAFB;
-      --dark: #111827;
+      --bg-alt: #F3F4F6;
+      --dark: #0B1220;
+      --dark-raised: #151F32;
       --muted: #6B7280;
       --muted-light: #9CA3AF;
       --border: #E5E7EB;
+      --teal: #2DD4BF;
       --blue: #2563EB;
       --green: #34D399;
       --white: #FFFFFF;
+      --accent-gradient: linear-gradient(135deg, #2DD4BF 0%, #2563EB 100%);
+      --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+      --shadow-md: 0 8px 24px rgba(16, 24, 40, 0.08);
+      --shadow-lg: 0 20px 48px rgba(16, 24, 40, 0.16);
+      --radius: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0B1220;
+        --bg-alt: #0F1830;
+        --dark: #060A14;
+        --dark-raised: #121C30;
+        --muted: #9CA3AF;
+        --muted-light: #6B7280;
+        --border: #1F2A3D;
+        --white: #152238;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+        --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.45);
+      }
+
+      body { color: #F3F4F6; }
+      .feature-card h3,
+      .steps li,
+      header.hero h1 { color: #F3F4F6; }
+      .phone-frame { border-color: #27354C !important; }
     }
 
     * { box-sizing: border-box; }
 
+    html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--dark);
-      line-height: 1.5;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
     a { color: var(--blue); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
     .wrap {
-      max-width: 880px;
+      max-width: 920px;
       margin: 0 auto;
       padding: 0 24px;
     }
 
+    /* ---------- Hero ---------- */
     header.hero {
-      background: var(--dark);
+      position: relative;
+      background: radial-gradient(circle at 20% 0%, rgba(45, 212, 191, 0.25), transparent 55%),
+                  radial-gradient(circle at 80% 10%, rgba(37, 99, 235, 0.3), transparent 50%),
+                  var(--dark);
       color: var(--white);
-      padding: 64px 0 56px;
+      padding: 80px 0 64px;
       text-align: center;
+      overflow: hidden;
     }
 
+    header.hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                         linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(to bottom, black, transparent);
+      pointer-events: none;
+    }
+
+    header.hero .hero-inner { position: relative; z-index: 1; }
+
     .logo {
-      width: 96px;
-      height: 96px;
-      border-radius: 20px;
+      width: 104px;
+      height: 104px;
+      border-radius: 24px;
       object-fit: cover;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-lg);
     }
 
     header.hero h1 {
-      font-size: 36px;
+      font-size: 42px;
       font-weight: 800;
-      margin: 0 0 10px;
+      letter-spacing: -0.02em;
+      margin: 0 0 12px;
+      color: #FFFFFF;
     }
 
     header.hero p.tagline {
-      font-size: 17px;
-      color: #D1D5DB;
+      font-size: 18px;
+      color: #CBD5E1;
       max-width: 480px;
-      margin: 0 auto 28px;
+      margin: 0 auto 32px;
     }
 
     .cta-row {
@@ -75,60 +142,108 @@
 
     .btn {
       display: inline-block;
-      padding: 12px 22px;
+      padding: 13px 24px;
       border-radius: 10px;
       font-weight: 600;
       font-size: 15px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
     }
 
     .btn-primary {
       background: var(--white);
       color: var(--dark);
+      box-shadow: var(--shadow-md);
     }
-    .btn-primary:hover { text-decoration: none; opacity: 0.9; }
+    .btn-primary:hover { text-decoration: none; transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 
     .btn-outline {
-      background: transparent;
+      background: rgba(255,255,255,0.05);
       color: var(--white);
-      border: 1px solid rgba(255,255,255,0.35);
+      border: 1px solid rgba(255,255,255,0.3);
     }
-    .btn-outline:hover { text-decoration: none; border-color: var(--white); }
+    .btn-outline:hover { text-decoration: none; border-color: var(--white); transform: translateY(-2px); }
 
-    main {
-      padding: 56px 0 80px;
-    }
+    /* ---------- Layout bands ---------- */
+    main { padding: 0 0 48px; }
 
-    section {
-      margin-bottom: 56px;
-    }
+    section { padding: 64px 0; }
+    section.alt { background: var(--bg-alt); }
 
     section h2 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+      text-align: center;
     }
 
+    section p.section-sub {
+      text-align: center;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      font-size: 15.5px;
+    }
+
+    /* ---------- Phone mockup ---------- */
+    .mock-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .phone-frame {
+      width: 280px;
+      border-radius: 36px;
+      border: 10px solid var(--dark);
+      background: var(--dark);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      line-height: 0;
+    }
+
+    .phone-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 26px;
+    }
+
+    /* ---------- Feature grid ---------- */
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 16px;
     }
 
     .feature-card {
       background: var(--white);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     }
 
-    .feature-card .emoji {
-      font-size: 26px;
-      margin-bottom: 10px;
-      display: block;
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(45, 212, 191, 0.4);
+    }
+
+    .feature-card .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+      background: var(--accent-gradient);
     }
 
     .feature-card h3 {
-      font-size: 15px;
+      font-size: 15.5px;
       font-weight: 700;
       margin: 0 0 6px;
     }
@@ -137,100 +252,89 @@
       font-size: 13.5px;
       color: var(--muted);
       margin: 0;
+      line-height: 1.55;
     }
 
-    .summary-mock {
-      background: var(--dark);
-      border-radius: 16px;
-      padding: 24px;
-      max-width: 320px;
-      margin: 0 auto;
-      color: var(--white);
-    }
-
-    .summary-mock .label {
-      color: var(--muted-light);
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .summary-mock .total {
-      font-size: 34px;
-      font-weight: 800;
-      margin: 4px 0 16px;
-    }
-
-    .summary-mock .row {
+    /* ---------- Privacy callout ---------- */
+    .privacy-note {
       display: flex;
-      gap: 24px;
+      align-items: flex-start;
+      gap: 14px;
+      background: rgba(45, 212, 191, 0.08);
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      font-size: 14.5px;
+      color: var(--dark);
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    @media (prefers-color-scheme: dark) {
+      .privacy-note { color: #E2E8F0; }
+    }
+    .privacy-note .icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
     }
 
-    .summary-mock .sub-label {
-      color: var(--muted-light);
-      font-size: 12px;
-    }
-
-    .summary-mock .sub-value {
-      font-size: 16px;
-      font-weight: 700;
-      margin-top: 2px;
-    }
-
-    .summary-mock .paid { color: var(--green); }
-
+    /* ---------- Steps ---------- */
     .steps {
       background: var(--white);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
+      border-radius: var(--radius);
+      padding: 28px 28px 8px;
+      box-shadow: var(--shadow-sm);
+      max-width: 640px;
+      margin: 0 auto;
     }
 
-    .steps ol {
-      margin: 0;
-      padding-left: 20px;
-    }
-
-    .steps li {
-      margin-bottom: 10px;
-      font-size: 14.5px;
-    }
+    .steps ol { margin: 0; padding-left: 20px; }
+    .steps li { margin-bottom: 10px; font-size: 14.5px; }
 
     pre {
       background: #0F172A;
-      color: #E5E7EB;
-      padding: 14px 16px;
-      border-radius: 10px;
+      color: #E2E8F0;
+      padding: 16px 18px;
+      border-radius: 12px;
       overflow-x: auto;
       font-size: 13px;
-      margin: 8px 0 0;
+      margin: 8px 0 20px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      line-height: 1.6;
     }
 
-    .privacy-note {
-      background: #ECFDF5;
-      border: 1px solid #A7F3D0;
-      border-radius: 14px;
-      padding: 18px 20px;
-      font-size: 14px;
-      color: #065F46;
-    }
+    pre .cmd { color: #5EEAD4; }
+    pre .cmt { color: #64748B; }
 
+    /* ---------- Footer ---------- */
     footer {
       border-top: 1px solid var(--border);
-      padding: 28px 0;
+      padding: 32px 0;
       text-align: center;
       font-size: 13px;
       color: var(--muted-light);
     }
 
+    footer .sep { margin: 0 8px; }
+
     @media (max-width: 480px) {
-      header.hero { padding: 48px 0 40px; }
-      header.hero h1 { font-size: 28px; }
+      header.hero { padding: 56px 0 48px; }
+      header.hero h1 { font-size: 30px; }
+      section { padding: 48px 0; }
+      .steps { padding: 22px 20px 4px; }
     }
   </style>
 </head>
 <body>
   <header class="hero">
-    <div class="wrap">
+    <div class="wrap hero-inner">
       <img class="logo" src="assets/logo.jpg" alt="Budget Planner logo" />
       <h1>Budget Planner</h1>
       <p class="tagline">
@@ -244,101 +348,111 @@
     </div>
   </header>
 
-  <main class="wrap">
+  <main>
     <section>
-      <h2>What it does</h2>
-      <div class="summary-mock">
-        <div class="label">Remaining this month</div>
-        <div class="total">$1,240.00</div>
-        <div class="row">
-          <div>
-            <div class="sub-label">Total due</div>
-            <div class="sub-value">$2,100.00</div>
+      <div class="wrap">
+        <h2>What it does</h2>
+        <p class="section-sub">A clear picture of what's due, what's paid, and what's left &mdash; every month.</p>
+        <div class="mock-wrap">
+          <div class="phone-frame">
+            <img src="assets/home-screenshot.png" alt="Budget Planner home screen showing monthly summary with total due, paid, and income, plus a list of bills marked as paid" loading="lazy" />
           </div>
-          <div>
-            <div class="sub-label">Paid</div>
-            <div class="sub-value paid">$860.00</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="alt">
+      <div class="wrap">
+        <h2>Features</h2>
+        <p class="section-sub">Everything you need to stay on top of your bills, nothing you don't.</p>
+        <div class="features">
+          <div class="feature-card">
+            <span class="icon">🧾</span>
+            <h3>Recurring bills</h3>
+            <p>Add bills once with a due day and category, and they roll forward every month automatically.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon">✅</span>
+            <h3>Mark as paid</h3>
+            <p>Tap a bill to mark it paid for the month and watch your remaining balance update instantly.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon">📊</span>
+            <h3>Monthly summary</h3>
+            <p>See total due, total paid, and what's left at a glance, broken down by month.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon">💱</span>
+            <h3>Multi-currency</h3>
+            <p>Choose the currency that matches your budget from the settings panel.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon">📤</span>
+            <h3>Export &amp; import</h3>
+            <p>Download your data as a JSON file anytime, and restore it on a new device or after reinstalling.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon">🔒</span>
+            <h3>Private by design</h3>
+            <p>Everything is stored locally on your device. No account, no server, no tracking.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon">📱</span>
+            <h3>iOS &amp; Android</h3>
+            <p>Built with React Native so it runs natively on both platforms from one codebase.</p>
           </div>
         </div>
       </div>
     </section>
 
     <section>
-      <h2>Features</h2>
-      <div class="features">
-        <div class="feature-card">
-          <span class="emoji">🧾</span>
-          <h3>Recurring bills</h3>
-          <p>Add bills once with a due day and category, and they roll forward every month automatically.</p>
-        </div>
-        <div class="feature-card">
-          <span class="emoji">✅</span>
-          <h3>Mark as paid</h3>
-          <p>Tap a bill to mark it paid for the month and watch your remaining balance update instantly.</p>
-        </div>
-        <div class="feature-card">
-          <span class="emoji">📊</span>
-          <h3>Monthly summary</h3>
-          <p>See total due, total paid, and what's left at a glance, broken down by month.</p>
-        </div>
-        <div class="feature-card">
-          <span class="emoji">💱</span>
-          <h3>Multi-currency</h3>
-          <p>Choose the currency that matches your budget from the settings panel.</p>
-        </div>
-        <div class="feature-card">
-          <span class="emoji">📤</span>
-          <h3>Export &amp; import</h3>
-          <p>Download your data as a JSON file anytime, and restore it on a new device or after reinstalling.</p>
-        </div>
-        <div class="feature-card">
-          <span class="emoji">🔒</span>
-          <h3>Private by design</h3>
-          <p>Everything is stored locally on your device. No account, no server, no tracking.</p>
-        </div>
-        <div class="feature-card">
-          <span class="emoji">📱</span>
-          <h3>iOS &amp; Android</h3>
-          <p>Built with React Native so it runs natively on both platforms from one codebase.</p>
+      <div class="wrap">
+        <div class="privacy-note">
+          <span class="icon">🔒</span>
+          <div>
+            Budget Planner stores all data locally on your device using AsyncStorage. Nothing is
+            sent to a server, and the app works entirely offline.
+          </div>
         </div>
       </div>
     </section>
 
-    <section>
-      <p class="privacy-note">
-        🔒 Budget Planner stores all data locally on your device using AsyncStorage. Nothing is
-        sent to a server, and the app works entirely offline.
-      </p>
-    </section>
-
-    <section id="get-started">
-      <h2>Get started</h2>
-      <div class="steps">
-        <ol>
-          <li>Clone the repository and install dependencies</li>
-        </ol>
-        <pre>git clone https://github.com/JoeyHissong/BudgetTracker.git
-cd BudgetTracker
-npm install</pre>
-        <ol start="2">
-          <li>Start Metro, then run the app on your platform of choice</li>
-        </ol>
-        <pre>npm start
-# in a separate terminal
-npm run ios      # or
-npm run android</pre>
-        <ol start="3">
-          <li>See the <a href="https://github.com/JoeyHissong/BudgetTracker#readme">README</a> for environment setup details.</li>
-        </ol>
+    <section class="alt" id="get-started">
+      <div class="wrap">
+        <h2>Get started</h2>
+        <p class="section-sub">Clone it, install it, run it &mdash; three steps and you're in.</p>
+        <div class="steps">
+          <ol>
+            <li>Clone the repository and install dependencies</li>
+          </ol>
+          <pre><span class="cmd">git clone</span> https://github.com/JoeyHissong/BudgetTracker.git
+<span class="cmd">cd</span> BudgetTracker
+<span class="cmd">npm install</span></pre>
+          <ol start="2">
+            <li>Start Metro, then run the app on your platform of choice</li>
+          </ol>
+          <pre><span class="cmd">npm start</span>
+<span class="cmt"># in a separate terminal</span>
+<span class="cmd">npm run ios</span>      <span class="cmt"># or</span>
+<span class="cmd">npm run android</span></pre>
+          <ol start="3">
+            <li>See the <a href="https://github.com/JoeyHissong/BudgetTracker#readme">README</a> for environment setup details.</li>
+          </ol>
+        </div>
       </div>
     </section>
   </main>
 
   <footer>
-    Budget Planner &mdash; built with React Native &middot;
-    <a href="https://github.com/JoeyHissong/BudgetTracker">Source on GitHub</a> &middot;
-    <a href="privacy.html">Privacy Policy</a> &middot;
-    <a href="https://www.joeyhissong.com">joeyhissong.com</a>
+    <div class="wrap">
+      Budget Planner &mdash; built with React Native
+      <span class="sep">&middot;</span>
+      <a href="https://github.com/JoeyHissong/BudgetTracker">Source on GitHub</a>
+      <span class="sep">&middot;</span>
+      <a href="privacy.html">Privacy Policy</a>
+      <span class="sep">&middot;</span>
+      <a href="https://www.joeyhissong.com">joeyhissong.com</a>
+    </div>
   </footer>
 </body>
 </html>

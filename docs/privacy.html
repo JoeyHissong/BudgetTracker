@@ -5,26 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy — Budget Planner</title>
   <meta name="description" content="Privacy Policy for Budget Planner, a local-only, privacy-first app for tracking recurring monthly bills." />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Privacy Policy — Budget Planner" />
+  <meta property="og:description" content="Budget Planner does not collect, transmit, or share any personal data. All information you enter stays on your device." />
+  <meta property="og:image" content="https://joeyhissong.github.io/BudgetTracker/assets/logo.jpg" />
+  <meta name="twitter:card" content="summary" />
+
   <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #F9FAFB;
-      --dark: #111827;
+      --bg-alt: #F3F4F6;
+      --dark: #0B1220;
       --muted: #6B7280;
       --muted-light: #9CA3AF;
       --border: #E5E7EB;
+      --teal: #2DD4BF;
       --blue: #2563EB;
       --white: #FFFFFF;
+      --accent-gradient: linear-gradient(135deg, #2DD4BF 0%, #2563EB 100%);
+      --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+      --shadow-md: 0 8px 24px rgba(16, 24, 40, 0.08);
+      --shadow-lg: 0 20px 48px rgba(16, 24, 40, 0.16);
+      --radius: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0B1220;
+        --bg-alt: #0F1830;
+        --dark: #060A14;
+        --muted: #9CA3AF;
+        --muted-light: #6B7280;
+        --border: #1F2A3D;
+        --white: #152238;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+        --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.45);
+      }
+      body { color: #F3F4F6; }
+      section h2 { color: #F3F4F6; }
     }
 
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--dark);
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
     a { color: var(--blue); text-decoration: none; }
@@ -37,35 +73,55 @@
     }
 
     header.hero {
-      background: var(--dark);
+      position: relative;
+      background: radial-gradient(circle at 20% 0%, rgba(45, 212, 191, 0.25), transparent 55%),
+                  radial-gradient(circle at 80% 10%, rgba(37, 99, 235, 0.3), transparent 50%),
+                  var(--dark);
       color: var(--white);
-      padding: 48px 0 40px;
+      padding: 56px 0 44px;
       text-align: center;
+      overflow: hidden;
     }
 
+    header.hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                         linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(to bottom, black, transparent);
+      pointer-events: none;
+    }
+
+    header.hero .hero-inner { position: relative; z-index: 1; }
+
     header.hero h1 {
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 800;
+      letter-spacing: -0.02em;
       margin: 0 0 8px;
+      color: #FFFFFF;
     }
 
     header.hero p.tagline {
       font-size: 15px;
-      color: #D1D5DB;
+      color: #CBD5E1;
       margin: 0;
     }
 
     main {
-      padding: 48px 0 72px;
+      padding: 56px 0 72px;
     }
 
     section {
-      margin-bottom: 36px;
+      margin-bottom: 40px;
     }
 
     section h2 {
       font-size: 20px;
       font-weight: 700;
+      letter-spacing: -0.01em;
       margin-bottom: 12px;
     }
 
@@ -84,12 +140,29 @@
     }
 
     .privacy-note {
-      background: #ECFDF5;
-      border: 1px solid #A7F3D0;
-      border-radius: 14px;
-      padding: 18px 20px;
-      font-size: 14px;
-      color: #065F46;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: rgba(45, 212, 191, 0.08);
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      font-size: 14.5px;
+      color: var(--dark);
+    }
+    @media (prefers-color-scheme: dark) {
+      .privacy-note { color: #E2E8F0; }
+    }
+    .privacy-note .icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
     }
 
     .updated {
@@ -99,22 +172,32 @@
 
     footer {
       border-top: 1px solid var(--border);
-      padding: 28px 0;
+      padding: 32px 0;
       text-align: center;
       font-size: 13px;
       color: var(--muted-light);
     }
 
+    footer .sep { margin: 0 8px; }
+
     .back-link {
-      display: inline-block;
-      margin-bottom: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 28px;
       font-size: 14px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 480px) {
+      header.hero { padding: 44px 0 36px; }
+      header.hero h1 { font-size: 26px; }
     }
   </style>
 </head>
 <body>
   <header class="hero">
-    <div class="wrap">
+    <div class="wrap hero-inner">
       <h1>Privacy Policy</h1>
       <p class="tagline">Budget Planner</p>
     </div>
@@ -132,10 +215,13 @@
     </section>
 
     <section>
-      <p class="privacy-note">
-        🔒 Budget Planner does not collect, transmit, or share any personal data. All information
-        you enter stays on your device.
-      </p>
+      <div class="privacy-note">
+        <span class="icon">🔒</span>
+        <div>
+          Budget Planner does not collect, transmit, or share any personal data. All information
+          you enter stays on your device.
+        </div>
+      </div>
     </section>
 
     <section>
@@ -209,9 +295,13 @@
   </main>
 
   <footer>
-    Budget Planner &mdash; built with React Native &middot;
-    <a href="https://github.com/JoeyHissong/BudgetTracker">Source on GitHub</a> &middot;
-    <a href="https://www.joeyhissong.com">joeyhissong.com</a>
+    <div class="wrap">
+      Budget Planner &mdash; built with React Native
+      <span class="sep">&middot;</span>
+      <a href="https://github.com/JoeyHissong/BudgetTracker">Source on GitHub</a>
+      <span class="sep">&middot;</span>
+      <a href="https://www.joeyhissong.com">joeyhissong.com</a>
+    </div>
   </footer>
 </body>
 </html>
