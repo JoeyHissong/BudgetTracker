@@ -20,6 +20,19 @@ const sampleBill: Bill = {
   note: '',
 };
 
+const sampleLoanBill: Bill = {
+  id: 'bill-2',
+  name: 'Car Loan',
+  amount: 350,
+  category: 'Loan/Debt',
+  dueDay: 15,
+  note: '',
+  lender: 'Chase',
+  interestRate: 5.25,
+  remainingBalance: 8400,
+  minimumPayment: 300,
+};
+
 const samplePaySchedule: PaySchedule = {
   amount: 2000,
   frequency: 'monthly',
@@ -86,6 +99,42 @@ describe('validateBackupData', () => {
     const backup = {
       ...validBackup,
       bills: [{ ...sampleBill, category: 'Not A Real Category' }],
+    };
+    expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
+  });
+
+  it('accepts a loan bill with interest rate, remaining balance, minimum payment, and lender', () => {
+    const backup = { ...validBackup, bills: [sampleLoanBill] };
+    expect(validateBackupData(backup)).toEqual(backup);
+  });
+
+  it('accepts a loan bill with the optional loan fields omitted', () => {
+    const { interestRate, remainingBalance, minimumPayment, lender, ...rest } =
+      sampleLoanBill;
+    const backup = { ...validBackup, bills: [rest] };
+    expect(validateBackupData(backup)).toEqual(backup);
+  });
+
+  it('rejects a loan bill with a non-numeric interest rate', () => {
+    const backup = {
+      ...validBackup,
+      bills: [{ ...sampleLoanBill, interestRate: '5.25' }],
+    };
+    expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
+  });
+
+  it('rejects a loan bill with a non-numeric remaining balance', () => {
+    const backup = {
+      ...validBackup,
+      bills: [{ ...sampleLoanBill, remainingBalance: 'a lot' }],
+    };
+    expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
+  });
+
+  it('rejects a loan bill with a non-string lender', () => {
+    const backup = {
+      ...validBackup,
+      bills: [{ ...sampleLoanBill, lender: 12345 }],
     };
     expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
   });

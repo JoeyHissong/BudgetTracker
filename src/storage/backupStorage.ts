@@ -125,7 +125,11 @@ const isBill = (value: unknown): value is Bill => {
     typeof bill.amount === 'number' &&
     isBillCategory(bill.category) &&
     typeof bill.dueDay === 'number' &&
-    typeof bill.note === 'string'
+    typeof bill.note === 'string' &&
+    (bill.interestRate === undefined || typeof bill.interestRate === 'number') &&
+    (bill.remainingBalance === undefined || typeof bill.remainingBalance === 'number') &&
+    (bill.minimumPayment === undefined || typeof bill.minimumPayment === 'number') &&
+    (bill.lender === undefined || typeof bill.lender === 'string')
   );
 };
 

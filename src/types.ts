@@ -15,6 +15,18 @@ export interface Bill {
   /** Day of the month the bill is due, 1-31 (clamped to the month's actual length). */
   dueDay: number;
   note: string;
+  /**
+   * Loan-specific details, only meaningful when category is 'Loan/Debt'.
+   * Kept optional so existing non-loan bills are unaffected.
+   */
+  /** Annual interest rate as a percentage, e.g. 5.25 for 5.25%. */
+  interestRate?: number;
+  /** Remaining principal balance owed on the loan. */
+  remainingBalance?: number;
+  /** Minimum required payment per period, if different from `amount`. */
+  minimumPayment?: number;
+  /** Name of the lender or institution the loan is with. */
+  lender?: string;
 }
 
 /** Tracks that a given bill was marked paid for a given "YYYY-MM" month. */

@@ -4,6 +4,7 @@ import { BillWithStatus } from '../hooks/useBills';
 import { getCategoryInfo } from '../constants/categories';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { formatDueDate, isPastDue } from '../utils/date';
+import { estimateBillPayoff, formatMonthsRemaining } from '../utils/loan';
 import { ThemeColors } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -20,6 +21,7 @@ const BillListItem: React.FC<Props> = ({ bill, month, onTogglePaid, onPress }) =
   const styles = useMemo(() => createStyles(colors), [colors]);
   const categoryInfo = getCategoryInfo(bill.category);
   const overdue = !bill.isPaid && isPastDue(month, bill.dueDay);
+  const payoff = bill.category === 'Loan/Debt' ? estimateBillPayoff(bill) : null;
 
   return (
     <Pressable
@@ -41,6 +43,21 @@ const BillListItem: React.FC<Props> = ({ bill, month, onTogglePaid, onPress }) =
           {formatDueDate(month, bill.dueDay)}
           {overdue ? ' · Overdue' : ''}
         </Text>
+        {bill.category === 'Loan/Debt' &&
+          (bill.remainingBalance !== undefined || bill.interestRate !== undefined) && (
+            <Text style={styles.loanMeta} numberOfLines={1}>
+              {bill.remainingBalance !== undefined
+                ? `${formatCurrency(bill.remainingBalance)} left`
+                : ''}
+              {bill.remainingBalance !== undefined && bill.interestRate !== undefined
+                ? ' · '
+                : ''}
+              {bill.interestRate !== undefined
+                ? `${bill.interestRate}% APR`
+                : ''}
+              {payoff ? ` · ${formatMonthsRemaining(payoff.monthsRemaining)}` : ''}
+            </Text>
+          )}
       </View>
       <Text style={styles.amount}>{formatCurrency(bill.amount)}</Text>
       <Pressable
@@ -95,6 +112,11 @@ const createStyles = (colors: ThemeColors) =>
     overdueMeta: {
       color: colors.danger,
       fontWeight: '600',
+    },
+    loanMeta: {
+      fontSize: 12,
+      color: colors.textMuted,
+      marginTop: 2,
     },
     amount: {
       fontSize: 15,

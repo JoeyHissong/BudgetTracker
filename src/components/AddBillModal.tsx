@@ -14,6 +14,8 @@ import { NewBillInput, BillWithStatus } from '../hooks/useBills';
 import { useKeyboardHeight } from '../hooks/useKeyboardHeight';
 import { ThemeColors } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { estimateLoanPayoff, formatMonthsRemaining } from '../utils/loan';
 import DayOfMonthPickerModal from './DayOfMonthPickerModal';
 
 interface Props {
@@ -33,15 +35,35 @@ const AddBillModal: React.FC<Props> = ({
   onDelete,
 }) => {
   const { colors } = useTheme();
+  const { formatCurrency } = useCurrency();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [dueDay, setDueDay] = useState('1');
   const [note, setNote] = useState('');
   const [category, setCategory] = useState<BillCategory>('Rent/Mortgage');
+  const [interestRate, setInterestRate] = useState('');
+  const [remainingBalance, setRemainingBalance] = useState('');
+  const [minimumPayment, setMinimumPayment] = useState('');
+  const [lender, setLender] = useState('');
   const [error, setError] = useState('');
   const [isDayPickerVisible, setIsDayPickerVisible] = useState(false);
   const keyboardHeight = useKeyboardHeight();
+
+  const isLoan = category === 'Loan/Debt';
+
+  const payoffEstimate = useMemo(() => {
+    if (!isLoan) {
+      return null;
+    }
+    const balance = Number(remainingBalance);
+    const payment = Number(minimumPayment || amount);
+    const rate = interestRate ? Number(interestRate) : undefined;
+    if (!remainingBalance.trim() || Number.isNaN(balance) || Number.isNaN(payment)) {
+      return null;
+    }
+    return estimateLoanPayoff(balance, payment, rate);
+  }, [isLoan, remainingBalance, minimumPayment, amount, interestRate]);
 
   useEffect(() => {
     if (visible && editingBill) {
@@ -50,12 +72,30 @@ const AddBillModal: React.FC<Props> = ({
       setDueDay(String(editingBill.dueDay));
       setNote(editingBill.note);
       setCategory(editingBill.category);
+      setInterestRate(
+        editingBill.interestRate !== undefined ? String(editingBill.interestRate) : '',
+      );
+      setRemainingBalance(
+        editingBill.remainingBalance !== undefined
+          ? String(editingBill.remainingBalance)
+          : '',
+      );
+      setMinimumPayment(
+        editingBill.minimumPayment !== undefined
+          ? String(editingBill.minimumPayment)
+          : '',
+      );
+      setLender(editingBill.lender ?? '');
     } else if (visible) {
       setName('');
       setAmount('');
       setDueDay('1');
       setNote('');
       setCategory('Rent/Mortgage');
+      setInterestRate('');
+      setRemainingBalance('');
+      setMinimumPayment('');
+      setLender('');
     }
     setError('');
     setIsDayPickerVisible(false);
@@ -94,12 +134,44 @@ const AddBillModal: React.FC<Props> = ({
       return;
     }
 
+    let parsedInterestRate: number | undefined;
+    let parsedRemainingBalance: number | undefined;
+    let parsedMinimumPayment: number | undefined;
+
+    if (isLoan) {
+      if (interestRate.trim()) {
+        parsedInterestRate = Number(interestRate);
+        if (Number.isNaN(parsedInterestRate) || parsedInterestRate < 0) {
+          setError('Enter a valid interest rate (0 or greater).');
+          return;
+        }
+      }
+      if (remainingBalance.trim()) {
+        parsedRemainingBalance = Number(remainingBalance);
+        if (Number.isNaN(parsedRemainingBalance) || parsedRemainingBalance < 0) {
+          setError('Enter a valid remaining balance (0 or greater).');
+          return;
+        }
+      }
+      if (minimumPayment.trim()) {
+        parsedMinimumPayment = Number(minimumPayment);
+        if (Number.isNaN(parsedMinimumPayment) || parsedMinimumPayment < 0) {
+          setError('Enter a valid minimum payment (0 or greater).');
+          return;
+        }
+      }
+    }
+
     onSubmit({
       name: name.trim(),
       amount: parsedAmount,
       category,
       dueDay: parsedDueDay,
       note: note.trim(),
+      interestRate: isLoan ? parsedInterestRate : undefined,
+      remainingBalance: isLoan ? parsedRemainingBalance : undefined,
+      minimumPayment: isLoan ? parsedMinimumPayment : undefined,
+      lender: isLoan ? lender.trim() || undefined : undefined,
     });
     onClose();
   };
@@ -206,6 +278,74 @@ const AddBillModal: React.FC<Props> = ({
               );
             })}
           </ScrollView>
+
+          {isLoan && (
+            <>
+              <Text style={styles.fieldLabel}>Lender (optional)</Text>
+              <TextInput
+                value={lender}
+                onChangeText={text => {
+                  setLender(text);
+                  setError('');
+                }}
+                placeholder="e.g. Chase, Sallie Mae"
+                style={styles.textInput}
+                placeholderTextColor={colors.textFaint}
+                accessibilityLabel="Lender"
+              />
+
+              <Text style={styles.fieldLabel}>Interest rate (APR %, optional)</Text>
+              <TextInput
+                value={interestRate}
+                onChangeText={text => {
+                  setInterestRate(text.replace(/[^0-9.]/g, ''));
+                  setError('');
+                }}
+                placeholder="e.g. 5.25"
+                keyboardType="decimal-pad"
+                style={styles.textInput}
+                placeholderTextColor={colors.textFaint}
+                accessibilityLabel="Interest rate"
+              />
+
+              <Text style={styles.fieldLabel}>Remaining balance (optional)</Text>
+              <TextInput
+                value={remainingBalance}
+                onChangeText={text => {
+                  setRemainingBalance(text.replace(/[^0-9.]/g, ''));
+                  setError('');
+                }}
+                placeholder="0.00"
+                keyboardType="decimal-pad"
+                style={styles.textInput}
+                placeholderTextColor={colors.textFaint}
+                accessibilityLabel="Remaining balance"
+              />
+
+              <Text style={styles.fieldLabel}>Minimum payment (optional)</Text>
+              <TextInput
+                value={minimumPayment}
+                onChangeText={text => {
+                  setMinimumPayment(text.replace(/[^0-9.]/g, ''));
+                  setError('');
+                }}
+                placeholder="Leave blank to use the amount above"
+                keyboardType="decimal-pad"
+                style={styles.textInput}
+                placeholderTextColor={colors.textFaint}
+                accessibilityLabel="Minimum payment"
+              />
+
+              {payoffEstimate && (
+                <Text style={styles.payoffEstimate}>
+                  Estimated payoff: {formatMonthsRemaining(payoffEstimate.monthsRemaining)}
+                  {payoffEstimate.totalInterestRemaining > 0
+                    ? ` · ~${formatCurrency(payoffEstimate.totalInterestRemaining)} interest`
+                    : ''}
+                </Text>
+              )}
+            </>
+          )}
 
           <Text style={styles.fieldLabel}>Note (optional)</Text>
           <TextInput
@@ -341,6 +481,11 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.danger,
       fontSize: 13,
       marginTop: 6,
+    },
+    payoffEstimate: {
+      fontSize: 13,
+      color: colors.textMuted,
+      marginTop: 8,
     },
     categoryScroll: {
       flexGrow: 0,

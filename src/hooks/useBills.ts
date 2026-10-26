@@ -14,6 +14,10 @@ export interface NewBillInput {
   category: BillCategory;
   dueDay: number;
   note: string;
+  interestRate?: number;
+  remainingBalance?: number;
+  minimumPayment?: number;
+  lender?: string;
 }
 
 export interface BillWithStatus extends Bill {

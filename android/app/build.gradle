@@ -93,8 +93,8 @@ android {
         applicationId "com.joeyhissong.budgettracker"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
-        versionName "1.3.0"
+        versionCode 5
+        versionName "1.4.0"
     }
     signingConfigs {
         debug {
@@ -115,6 +115,9 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            // Lets a local dev build install alongside the Play Store build
+            // (which uses the release signing key) on the same device.
+            applicationIdSuffix ".debug"
         }
         release {
             // Falls back to the debug keystore if keystore.properties is absent,
