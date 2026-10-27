@@ -10,6 +10,7 @@ import AddPayScheduleModal from '../components/AddPayScheduleModal';
 import SettingsScreen from './SettingsScreen';
 import { BillWithStatus } from '../hooks/useBills';
 import { useTimeline } from '../hooks/useTimeline';
+import { useBillReminderScheduler } from '../hooks/useBillReminderScheduler';
 import { addMonths } from '../utils/date';
 import { ThemeColors } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
@@ -40,6 +41,12 @@ const HomeScreen: React.FC = () => {
     removePaySchedule,
     reload,
   } = useTimeline(selectedMonth);
+
+  const bills = useMemo(
+    () => timeline.filter(item => item.type === 'bill').map(item => item.bill),
+    [timeline],
+  );
+  useBillReminderScheduler(bills, isLoading);
 
   const openAddModal = () => {
     setEditingBill(null);

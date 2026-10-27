@@ -17,6 +17,13 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import CurrencyPickerModal from '../components/CurrencyPickerModal';
 import { ThemeColors, ThemePreference } from '../constants/theme';
 import { useTheme } from '../contexts/ThemeContext';
+import { useReminders } from '../contexts/ReminderContext';
+import {
+  canScheduleExactReminders,
+  openExactAlarmSettings,
+  requestNotificationPermission,
+  sendTestReminder,
+} from '../notifications/billReminders';
 import {
   exportBackupToFile,
   pickAndParseBackupFile,
@@ -30,6 +37,13 @@ const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
   { value: 'system', label: 'System' },
   { value: 'light', label: 'Light' },
   { value: 'dark', label: 'Dark' },
+];
+
+const REMINDER_HOUR_OPTIONS: { value: number; label: string }[] = [
+  { value: 8, label: '8 AM' },
+  { value: 9, label: '9 AM' },
+  { value: 12, label: '12 PM' },
+  { value: 18, label: '6 PM' },
 ];
 
 interface Props {
@@ -63,6 +77,8 @@ const SettingsScreen: React.FC<Props> = ({
     setThemePreference,
     reload: reloadTheme,
   } = useTheme();
+  const { remindersEnabled, setRemindersEnabled, reminderHour, setReminderHour } =
+    useReminders();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [startDateInput, setStartDateInput] = useState(budgetStartDate);
   const [startDateError, setStartDateError] = useState('');
@@ -126,6 +142,45 @@ const SettingsScreen: React.FC<Props> = ({
         },
       ],
     );
+  };
+
+  const handleToggleReminders = async (next: boolean) => {
+    if (!next) {
+      setRemindersEnabled(false);
+      return;
+    }
+    const granted = await requestNotificationPermission();
+    if (!granted) {
+      Alert.alert(
+        'Notifications blocked',
+        'Enable notifications for Budget Planner in your device settings to get bill due reminders.',
+      );
+      return;
+    }
+    setRemindersEnabled(true);
+    const canScheduleExact = await canScheduleExactReminders();
+    if (!canScheduleExact) {
+      Alert.alert(
+        'Allow exact alarms',
+        "To make sure bill reminders arrive on time, allow Budget Planner to schedule exact alarms in your device's settings.",
+        [
+          { text: 'Not now', style: 'cancel' },
+          { text: 'Open settings', onPress: () => openExactAlarmSettings() },
+        ],
+      );
+    }
+  };
+
+  const handleSendTestReminder = async () => {
+    const granted = await requestNotificationPermission();
+    if (!granted) {
+      Alert.alert(
+        'Notifications blocked',
+        'Enable notifications for Budget Planner in your device settings to see a reminder.',
+      );
+      return;
+    }
+    await sendTestReminder();
   };
 
   useEffect(() => {
@@ -274,6 +329,62 @@ const SettingsScreen: React.FC<Props> = ({
               thumbColor={colors.surface}
             />
           </View>
+
+          <Text style={[styles.fieldLabel, styles.sectionSpacing]}>
+            Reminders
+          </Text>
+          <View style={styles.toggleRow}>
+            <View style={styles.toggleTextWrap}>
+              <Text style={styles.toggleLabel}>Bill due today</Text>
+              <Text style={styles.toggleSubtext}>
+                Get a notification on the day each bill is due
+              </Text>
+            </View>
+            <Switch
+              value={remindersEnabled}
+              onValueChange={handleToggleReminders}
+              accessibilityRole="switch"
+              accessibilityLabel="Bill due today reminders"
+              accessibilityState={{ checked: remindersEnabled }}
+              trackColor={{ false: colors.handle, true: colors.accent }}
+              thumbColor={colors.surface}
+            />
+          </View>
+          {remindersEnabled && (
+            <View style={[styles.segmentedControl, styles.reminderHourControl]}>
+              {REMINDER_HOUR_OPTIONS.map(option => {
+                const selected = option.value === reminderHour;
+                return (
+                  <Pressable
+                    key={option.value}
+                    style={[styles.segment, selected && styles.segmentSelected]}
+                    onPress={() => setReminderHour(option.value)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remind me at ${option.label}`}
+                    accessibilityState={{ selected }}
+                  >
+                    <Text
+                      style={[
+                        styles.segmentLabel,
+                        selected && styles.segmentLabelSelected,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
+          <Pressable
+            style={[styles.linkRow, styles.sectionSpacing]}
+            onPress={handleSendTestReminder}
+            accessibilityRole="button"
+            accessibilityLabel="Send a test bill reminder notification"
+          >
+            <Text style={styles.linkRowLabel}>Send test reminder</Text>
+            <Text style={styles.chevron}>›</Text>
+          </Pressable>
 
           <Text style={[styles.fieldLabel, styles.sectionSpacing]}>
             Budget tracking
@@ -478,6 +589,9 @@ const createStyles = (colors: ThemeColors) =>
     },
     segmentLabelSelected: {
       color: colors.text,
+    },
+    reminderHourControl: {
+      marginTop: 12,
     },
     toggleRow: {
       flexDirection: 'row',

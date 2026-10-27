@@ -19,3 +19,20 @@ jest.mock('@dr.pogodin/react-native-fs', () => ({
   readFile: jest.fn(),
   unlink: jest.fn(),
 }));
+
+jest.mock('@notifee/react-native', () => ({
+  __esModule: true,
+  default: {
+    createChannel: jest.fn(() => Promise.resolve('bill-due-reminders')),
+    requestPermission: jest.fn(() => Promise.resolve({ authorizationStatus: 1 })),
+    getNotificationSettings: jest.fn(() => Promise.resolve({ android: { alarm: 1 } })),
+    openAlarmPermissionSettings: jest.fn(() => Promise.resolve()),
+    getTriggerNotificationIds: jest.fn(() => Promise.resolve([])),
+    cancelTriggerNotifications: jest.fn(() => Promise.resolve()),
+    createTriggerNotification: jest.fn(() => Promise.resolve('id')),
+  },
+  AndroidImportance: { HIGH: 4 },
+  AndroidNotificationSetting: { ENABLED: 1, DISABLED: 2 },
+  AuthorizationStatus: { NOT_DETERMINED: -1, DENIED: 0, AUTHORIZED: 1, PROVISIONAL: 2 },
+  TriggerType: { TIMESTAMP: 0, INTERVAL: 1 },
+}));

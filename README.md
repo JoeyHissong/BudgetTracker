@@ -10,6 +10,7 @@ Built with [React Native](https://reactnative.dev) and TypeScript.
 - **Mark as paid** — Tap a bill to mark it paid for the month and watch your remaining balance update instantly.
 - **Monthly summary** — See total due, total paid, and what's left at a glance, broken down by month.
 - **Pay schedule tracking** — Track upcoming paydays alongside your bills to see how income lines up with what's due.
+- **Bill due reminders** — Turn on local notifications in Settings to get alerted the day each bill is due, with a configurable reminder time. Entirely on-device — no push service involved.
 - **Multi-currency** — Choose the currency that matches your budget from the settings panel.
 - **Export & import your data** — Download everything as a JSON file from Settings, and restore it later (new device, reinstall, etc.) by importing that same file.
 - **Private by design** — Everything is stored locally on-device with AsyncStorage. No account, no server, no tracking.
@@ -22,8 +23,9 @@ App.tsx                   App entry point
 src/
   components/             Reusable UI (bill list items, modals, summary card, etc.)
   constants/              Static data (currency list, etc.)
-  contexts/                React context providers (currency, theme)
-  hooks/                   Data/state hooks (bills, pay schedule, timeline)
+  contexts/                React context providers (currency, theme, reminders)
+  hooks/                   Data/state hooks (bills, pay schedule, timeline, bill reminder scheduling)
+  notifications/           Local notification scheduling for bill due reminders (via Notifee)
   screens/                 Top-level screens (Home, Settings)
   storage/                 AsyncStorage-backed persistence (bills, pay schedule, settings, backup export/import)
   utils/                   Pure helpers (date math, currency formatting)
@@ -95,6 +97,10 @@ npm run lint # run ESLint
 ## Backing up your data
 
 Since everything is stored locally with no account or cloud sync, Settings → Data lets you export a JSON snapshot of all your bills, pay schedule, and preferences, and import it back later (e.g. after reinstalling or switching devices). Importing fully replaces the data currently in the app. This feature uses [`@react-native-documents/picker`](https://react-native-documents.github.io/) for the native save/open dialogs and [`@dr.pogodin/react-native-fs`](https://github.com/birdofpreyru/react-native-fs) for reading/writing the file — both are native modules, so after pulling changes that touch them you'll need to reinstall CocoaPods (`bundle exec pod install`) and rebuild the Android app.
+
+## Bill due reminders
+
+Settings → Reminders has a toggle for "Bill due today" notifications, plus a preset to pick what hour they fire (default 9 AM). Reminders are scheduled on-device for every bill a few months ahead using [`@notifee/react-native`](https://notifee.app) — there's no push service or backend involved. On Android 12+, exact-time delivery also depends on the system's "Alarms & reminders" permission; the app walks the user to that settings screen if it isn't granted. Like the backup feature above, Notifee is a native module, so a fresh clone needs `bundle exec pod install` and a rebuild before reminders work on a device.
 
 ## Privacy
 

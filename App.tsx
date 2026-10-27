@@ -11,6 +11,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import HomeScreen from './src/screens/HomeScreen';
 import { CurrencyProvider } from './src/contexts/CurrencyContext';
 import { ThemeProvider, useTheme } from './src/contexts/ThemeContext';
+import { ReminderProvider } from './src/contexts/ReminderContext';
 
 const AppContent = () => {
   const { isDark, colors } = useTheme();
@@ -34,7 +35,9 @@ function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <CurrencyProvider>
-          <AppContent />
+          <ReminderProvider>
+            <AppContent />
+          </ReminderProvider>
         </CurrencyProvider>
       </ThemeProvider>
     </SafeAreaProvider>
