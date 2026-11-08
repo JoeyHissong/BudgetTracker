@@ -4,8 +4,10 @@ import {
   Alert,
   BackHandler,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Switch,
   Text,
@@ -31,6 +33,9 @@ import {
 import { restoreBackupData } from '../storage/backupStorage';
 
 const DEVELOPER_URL = 'https://www.joeyhissong.com';
+const SHARE_URL = 'https://joeyhissong.github.io/BudgetTracker/';
+const SHARE_MESSAGE =
+  'I use Budget Planner to track my recurring bills — no sign-up, no ads, everything stays on your device. Check it out:';
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
@@ -168,6 +173,19 @@ const SettingsScreen: React.FC<Props> = ({
           { text: 'Open settings', onPress: () => openExactAlarmSettings() },
         ],
       );
+    }
+  };
+
+  const handleShareApp = async () => {
+    try {
+      await Share.share(
+        Platform.OS === 'ios'
+          ? { message: SHARE_MESSAGE, url: SHARE_URL }
+          : { message: `${SHARE_MESSAGE} ${SHARE_URL}` },
+        { dialogTitle: 'Share Budget Planner' },
+      );
+    } catch (error) {
+      console.warn('Failed to open share sheet', error);
     }
   };
 
@@ -441,6 +459,19 @@ const SettingsScreen: React.FC<Props> = ({
             ) : (
               <Text style={styles.chevron}>›</Text>
             )}
+          </Pressable>
+
+          <Text style={[styles.fieldLabel, styles.sectionSpacing]}>
+            Spread the word
+          </Text>
+          <Pressable
+            style={styles.linkRow}
+            onPress={handleShareApp}
+            accessibilityRole="button"
+            accessibilityLabel="Share Budget Planner with friends"
+          >
+            <Text style={styles.linkRowLabel}>Share app</Text>
+            <Text style={styles.chevron}>›</Text>
           </Pressable>
 
           <Pressable

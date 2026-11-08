@@ -5,8 +5,6 @@ import ReactAppDependencyProvider
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-  var window: UIWindow?
-
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
 
@@ -21,13 +19,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeDelegate = delegate
     reactNativeFactory = factory
 
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    factory.startReactNative(
-      withModuleName: "BudgetPlanner",
-      in: window,
-      launchOptions: launchOptions
-    )
+    // Window creation now happens in SceneDelegate, which iOS 27 / Xcode 27
+    // requires: apps built with the iOS 27 SDK must adopt the UIScene
+    // lifecycle or they crash at launch with
+    // _UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption.
 
     return true
   }
