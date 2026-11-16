@@ -93,13 +93,15 @@ const HomeScreen: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.topBar}>
         <Pressable
-          style={styles.settingsButton}
+          style={styles.menuButton}
           onPress={() => setIsSettingsVisible(true)}
           accessibilityRole="button"
           accessibilityLabel="Open settings"
           hitSlop={8}
         >
-          <Text style={styles.settingsIcon}>⚙️</Text>
+          <View style={styles.hamburgerBar} />
+          <View style={[styles.hamburgerBar, styles.hamburgerBarMiddle]} />
+          <View style={styles.hamburgerBar} />
         </Pressable>
       </View>
       <MonthHeader
@@ -251,18 +253,24 @@ const createStyles = (colors: ThemeColors) =>
     topBar: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'flex-end',
+      justifyContent: 'flex-start',
       paddingHorizontal: 12,
       paddingTop: 4,
     },
-    settingsButton: {
+    menuButton: {
       width: 36,
       height: 36,
       alignItems: 'center',
       justifyContent: 'center',
     },
-    settingsIcon: {
-      fontSize: 20,
+    hamburgerBar: {
+      width: 20,
+      height: 2,
+      borderRadius: 1,
+      backgroundColor: colors.text,
+    },
+    hamburgerBarMiddle: {
+      marginVertical: 4,
     },
     listContent: {
       paddingBottom: 100,

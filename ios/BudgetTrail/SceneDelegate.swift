@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     let window = UIWindow(windowScene: windowScene)
 
     factory.startReactNative(
-      withModuleName: "BudgetPlanner",
+      withModuleName: "BudgetTrail",
       in: window,
       launchOptions: nil
     )

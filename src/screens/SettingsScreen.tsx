@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   BackHandler,
   Linking,
   Platform,
@@ -12,8 +13,10 @@ import {
   Switch,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getCurrencyOption } from '../constants/currencies';
 import { useCurrency } from '../contexts/CurrencyContext';
 import CurrencyPickerModal from '../components/CurrencyPickerModal';
@@ -91,6 +94,50 @@ const SettingsScreen: React.FC<Props> = ({
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const selectedCurrency = getCurrencyOption(currencyCode);
+
+  const { width: screenWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const drawerWidth = Math.min(320, screenWidth * 0.82);
+  const [isRendered, setIsRendered] = useState(visible);
+  const translateX = useRef(new Animated.Value(visible ? 0 : -drawerWidth)).current;
+  const backdropOpacity = useRef(new Animated.Value(visible ? 1 : 0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setIsRendered(true);
+      Animated.parallel([
+        Animated.timing(translateX, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(backdropOpacity, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(translateX, {
+          toValue: -drawerWidth,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(backdropOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(({ finished }) => {
+        if (finished) {
+          setIsRendered(false);
+        }
+      });
+    }
+    // Only the open/close transition should re-trigger this animation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -241,20 +288,29 @@ const SettingsScreen: React.FC<Props> = ({
     return () => subscription.remove();
   }, [visible, onClose]);
 
-  if (!visible) {
+  if (!isRendered) {
     return null;
   }
 
   return (
-    <View style={styles.backdrop}>
-      <Pressable style={styles.backdropTouchable} onPress={onClose} />
-      <View style={styles.sheetWrap}>
+    <View style={styles.backdrop} pointerEvents={visible ? 'auto' : 'none'}>
+      <Animated.View style={[styles.backdropOverlay, { opacity: backdropOpacity }]}>
+        <Pressable style={styles.backdropTouchable} onPress={onClose} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.drawer,
+          { width: drawerWidth, transform: [{ translateX }] },
+        ]}
+      >
         <ScrollView
           style={styles.sheet}
-          contentContainerStyle={styles.sheetContent}
+          contentContainerStyle={[
+            styles.sheetContent,
+            { paddingBottom: 32 + insets.bottom },
+          ]}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.handle} />
           <View style={styles.titleRow}>
             <Text style={styles.title}>Settings</Text>
             <Pressable
@@ -267,6 +323,7 @@ const SettingsScreen: React.FC<Props> = ({
             </Pressable>
           </View>
 
+          <Text style={styles.fieldLabel}>General</Text>
           <Pressable
             style={styles.linkRow}
             onPress={() => setIsCurrencyPickerVisible(true)}
@@ -277,23 +334,6 @@ const SettingsScreen: React.FC<Props> = ({
             <View style={styles.linkRowValueWrap}>
               <Text style={styles.linkRowValue}>
                 {selectedCurrency.symbol} {selectedCurrency.code}
-              </Text>
-              <Text style={styles.chevron}>›</Text>
-            </View>
-          </Pressable>
-
-          <Pressable
-            style={[styles.linkRow, styles.sectionSpacing]}
-            onPress={onEditPaySchedule}
-            accessibilityRole="button"
-            accessibilityLabel={
-              hasPaySchedule ? 'Edit pay schedule' : 'Add pay schedule'
-            }
-          >
-            <Text style={styles.linkRowLabel}>Pay schedule</Text>
-            <View style={styles.linkRowValueWrap}>
-              <Text style={styles.linkRowValue}>
-                {hasPaySchedule ? 'Edit' : 'Add'}
               </Text>
               <Text style={styles.chevron}>›</Text>
             </View>
@@ -405,9 +445,25 @@ const SettingsScreen: React.FC<Props> = ({
           </Pressable>
 
           <Text style={[styles.fieldLabel, styles.sectionSpacing]}>
-            Budget tracking
+            Budget
           </Text>
-          <View style={styles.startDateCard}>
+          <Pressable
+            style={styles.linkRow}
+            onPress={onEditPaySchedule}
+            accessibilityRole="button"
+            accessibilityLabel={
+              hasPaySchedule ? 'Edit pay schedule' : 'Add pay schedule'
+            }
+          >
+            <Text style={styles.linkRowLabel}>Pay schedule</Text>
+            <View style={styles.linkRowValueWrap}>
+              <Text style={styles.linkRowValue}>
+                {hasPaySchedule ? 'Edit' : 'Add'}
+              </Text>
+              <Text style={styles.chevron}>›</Text>
+            </View>
+          </Pressable>
+          <View style={[styles.startDateCard, styles.subSectionSpacing]}>
             <Text style={styles.toggleLabel}>Start date</Text>
             <Text style={styles.toggleSubtext}>
               The date you started tracking with this app. Bills and paychecks
@@ -485,7 +541,7 @@ const SettingsScreen: React.FC<Props> = ({
             </Text>
           </Pressable>
         </ScrollView>
-      </View>
+      </Animated.View>
 
       <CurrencyPickerModal
         visible={isCurrencyPickerVisible}
@@ -505,37 +561,40 @@ const createStyles = (colors: ThemeColors) =>
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: colors.backdrop,
-      justifyContent: 'flex-end',
       zIndex: 10,
     },
-    backdropTouchable: {
+    backdropOverlay: {
       position: 'absolute',
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
+      backgroundColor: colors.backdrop,
     },
-    sheetWrap: {
-      width: '100%',
-      maxHeight: '88%',
+    backdropTouchable: {
+      flex: 1,
+    },
+    drawer: {
+      position: 'absolute',
+      top: 0,
+      bottom: 0,
+      left: 0,
+      backgroundColor: colors.surface,
+      borderTopRightRadius: 24,
+      borderBottomRightRadius: 24,
+      shadowColor: colors.shadow,
+      shadowOpacity: 0.2,
+      shadowRadius: 16,
+      shadowOffset: { width: 6, height: 0 },
+      elevation: 10,
     },
     sheet: {
-      backgroundColor: colors.surface,
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
+      flex: 1,
     },
     sheetContent: {
       padding: 20,
+      paddingTop: 24,
       paddingBottom: 32,
-    },
-    handle: {
-      width: 40,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: colors.handle,
-      alignSelf: 'center',
-      marginBottom: 16,
     },
     titleRow: {
       flexDirection: 'row',
@@ -561,6 +620,9 @@ const createStyles = (colors: ThemeColors) =>
     },
     sectionSpacing: {
       marginTop: 20,
+    },
+    subSectionSpacing: {
+      marginTop: 12,
     },
     linkRow: {
       flexDirection: 'row',
