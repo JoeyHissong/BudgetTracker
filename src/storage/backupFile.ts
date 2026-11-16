@@ -1,6 +1,7 @@
 import {
   pick,
   saveDocuments,
+  keepLocalCopy,
   isErrorWithCode,
   errorCodes,
 } from '@react-native-documents/picker';
@@ -66,6 +67,32 @@ export const pickAndParseBackupFile = async (): Promise<BackupData | null> => {
     throw error;
   }
 
-  const raw = await RNFS.readFile(pickResult.uri, 'utf8');
-  return parseBackupJSON(raw);
+  // `pickResult.uri` is a `file://` URI on iOS and can be percent-encoded
+  // (e.g. spaces become `%20`). RNFS strips the `file://` prefix but does
+  // not decode the remainder, so reading it directly can fail with
+  // "ENOENT: no such file or directory" for file names containing spaces
+  // or other special characters. `keepLocalCopy` copies the picked file
+  // into app storage and hands back a plain, readable local path.
+  const [localCopy] = await keepLocalCopy({
+    files: [
+      {
+        uri: pickResult.uri,
+        fileName: pickResult.name ?? EXPORT_FILE_NAME(),
+      },
+    ],
+    destination: 'cachesDirectory',
+  });
+
+  if (localCopy.status === 'error') {
+    throw new Error(localCopy.copyError);
+  }
+
+  try {
+    const raw = await RNFS.readFile(localCopy.localUri, 'utf8');
+    return parseBackupJSON(raw);
+  } finally {
+    RNFS.unlink(localCopy.localUri).catch(() => {
+      // Best-effort cleanup of the cached copy; nothing to do if it fails.
+    });
+  }
 };

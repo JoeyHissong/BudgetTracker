@@ -1,4 +1,4 @@
-# Budget Planner
+# BudgetTrail
 
 A simple, local-only app for tracking recurring monthly bills. No sign-up, no cloud, no ads — just your bills.
 
@@ -104,7 +104,7 @@ Settings → Reminders has a toggle for "Bill due today" notifications, plus a p
 
 ## Privacy
 
-Budget Planner stores all data locally on your device using AsyncStorage. Nothing is sent to a server, and the app works entirely offline. The export/import feature only writes to a file you explicitly choose to save or open — the app never transmits data anywhere. See [`docs/privacy.html`](docs/privacy.html) for the full privacy policy.
+BudgetTrail stores all data locally on your device using AsyncStorage. Nothing is sent to a server, and the app works entirely offline. The export/import feature only writes to a file you explicitly choose to save or open — the app never transmits data anywhere. See [`docs/privacy.html`](docs/privacy.html) for the full privacy policy.
 
 ## License
 
