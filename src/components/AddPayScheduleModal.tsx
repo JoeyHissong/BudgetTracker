@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   BackHandler,
   Pressable,
   ScrollView,
@@ -134,8 +135,21 @@ const AddPayScheduleModal: React.FC<Props> = ({
   };
 
   const handleDelete = () => {
-    onDelete();
-    onClose();
+    Alert.alert(
+      'Remove pay schedule?',
+      "This will remove your pay schedule and its payday entries from the timeline. This can't be undone.",
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => {
+            onDelete();
+            onClose();
+          },
+        },
+      ],
+    );
   };
 
   if (!visible) {
