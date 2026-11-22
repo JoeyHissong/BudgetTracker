@@ -103,6 +103,65 @@ describe('validateBackupData', () => {
     expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
   });
 
+  it('rejects a bill with a due day outside 1-31', () => {
+    for (const dueDay of [0, 32, 1.5]) {
+      const backup = { ...validBackup, bills: [{ ...sampleBill, dueDay }] };
+      expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
+    }
+  });
+
+  it('rejects a bill with a zero or negative amount', () => {
+    for (const amount of [0, -50]) {
+      const backup = { ...validBackup, bills: [{ ...sampleBill, amount }] };
+      expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
+    }
+  });
+
+  it('rejects a bill with an empty name', () => {
+    const backup = { ...validBackup, bills: [{ ...sampleBill, name: '   ' }] };
+    expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
+  });
+
+  it('rejects a loan bill with a negative interest rate, balance, or minimum payment', () => {
+    for (const overrides of [
+      { interestRate: -1 },
+      { remainingBalance: -100 },
+      { minimumPayment: -5 },
+    ]) {
+      const backup = {
+        ...validBackup,
+        bills: [{ ...sampleLoanBill, ...overrides }],
+      };
+      expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
+    }
+  });
+
+  it('accepts boundary values: due day 1 and 31, small positive amount', () => {
+    const backup = {
+      ...validBackup,
+      bills: [{ ...sampleBill, dueDay: 31, amount: 0.01 }],
+    };
+    expect(validateBackupData(backup)).toEqual(backup);
+  });
+
+  it('rejects a pay schedule with an invalid amount, day, or anchor date', () => {
+    for (const overrides of [
+      { amount: 0 },
+      { amount: -100 },
+      { dayOfMonth: 0 },
+      { dayOfMonth: 32 },
+      { secondDayOfMonth: 0 },
+      { anchorDate: '2026-13-01' },
+      { anchorDate: 'not a date' },
+    ]) {
+      const backup = {
+        ...validBackup,
+        paySchedule: { ...samplePaySchedule, ...overrides },
+      };
+      expect(() => validateBackupData(backup)).toThrow(BackupValidationError);
+    }
+  });
+
   it('accepts a loan bill with interest rate, remaining balance, minimum payment, and lender', () => {
     const backup = { ...validBackup, bills: [sampleLoanBill] };
     expect(validateBackupData(backup)).toEqual(backup);

@@ -114,6 +114,35 @@ const isPayFrequency = (value: unknown): value is PayFrequency =>
 const isThemePreference = (value: unknown): value is ThemePreference =>
   value === 'system' || value === 'light' || value === 'dark';
 
+/** A finite number greater than zero, e.g. a bill or pay amount. */
+const isPositiveFiniteNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && value > 0;
+
+/** A finite number zero or greater, e.g. an interest rate or balance. */
+const isNonNegativeFiniteNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0;
+
+/** A day of the month, 1-31. */
+const isDayOfMonth = (value: unknown): value is number =>
+  typeof value === 'number' &&
+  Number.isInteger(value) &&
+  value >= 1 &&
+  value <= 31;
+
+/** True for a real calendar date in "YYYY-MM-DD" form. */
+const isValidIsoDate = (value: unknown): value is string => {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+  const [year, month, day] = value.split('-').map(Number);
+  const parsed = new Date(year, month - 1, day);
+  return (
+    parsed.getFullYear() === year &&
+    parsed.getMonth() === month - 1 &&
+    parsed.getDate() === day
+  );
+};
+
 const isBill = (value: unknown): value is Bill => {
   if (!value || typeof value !== 'object') {
     return false;
@@ -122,13 +151,17 @@ const isBill = (value: unknown): value is Bill => {
   return (
     typeof bill.id === 'string' &&
     typeof bill.name === 'string' &&
-    typeof bill.amount === 'number' &&
+    bill.name.trim().length > 0 &&
+    isPositiveFiniteNumber(bill.amount) &&
     isBillCategory(bill.category) &&
-    typeof bill.dueDay === 'number' &&
+    isDayOfMonth(bill.dueDay) &&
     typeof bill.note === 'string' &&
-    (bill.interestRate === undefined || typeof bill.interestRate === 'number') &&
-    (bill.remainingBalance === undefined || typeof bill.remainingBalance === 'number') &&
-    (bill.minimumPayment === undefined || typeof bill.minimumPayment === 'number') &&
+    (bill.interestRate === undefined ||
+      isNonNegativeFiniteNumber(bill.interestRate)) &&
+    (bill.remainingBalance === undefined ||
+      isNonNegativeFiniteNumber(bill.remainingBalance)) &&
+    (bill.minimumPayment === undefined ||
+      isNonNegativeFiniteNumber(bill.minimumPayment)) &&
     (bill.lender === undefined || typeof bill.lender === 'string')
   );
 };
@@ -149,12 +182,12 @@ const isPaySchedule = (value: unknown): value is PaySchedule => {
   }
   const schedule = value as Record<string, unknown>;
   return (
-    typeof schedule.amount === 'number' &&
+    isPositiveFiniteNumber(schedule.amount) &&
     isPayFrequency(schedule.frequency) &&
-    typeof schedule.anchorDate === 'string' &&
-    typeof schedule.dayOfMonth === 'number' &&
+    isValidIsoDate(schedule.anchorDate) &&
+    isDayOfMonth(schedule.dayOfMonth) &&
     (schedule.secondDayOfMonth === undefined ||
-      typeof schedule.secondDayOfMonth === 'number')
+      isDayOfMonth(schedule.secondDayOfMonth))
   );
 };
 
