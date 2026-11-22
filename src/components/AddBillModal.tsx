@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   BackHandler,
   Pressable,
   ScrollView,
@@ -177,10 +178,24 @@ const AddBillModal: React.FC<Props> = ({
   };
 
   const handleDelete = () => {
-    if (editingBill) {
-      onDelete(editingBill.id);
-      onClose();
+    if (!editingBill) {
+      return;
     }
+    Alert.alert(
+      'Delete bill?',
+      `This will delete "${editingBill.name}" and its payment history. This can't be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            onDelete(editingBill.id);
+            onClose();
+          },
+        },
+      ],
+    );
   };
 
   if (!visible) {
